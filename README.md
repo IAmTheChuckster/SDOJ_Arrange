@@ -3,6 +3,7 @@
 ## To do
 1. Create 1.51 Mode based on 360 1.5
 2. Create DFK-like arrange mode using 1.51 mode as a base.
+3. Bring in furious bar from DFK Black Label
 
    
 ## About this project
