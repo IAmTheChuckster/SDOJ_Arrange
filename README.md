@@ -7,7 +7,9 @@
 
    
 ## About this project
-Why did I make this? Because it's fun and for my own personal research to see the capabilities of Claude.
+Why did I make this? Because it's fun and for my own personal research to see the capabilities of Claude.<br> 
+While Claude was used I put effort in making sure there are balanced gameplay.<br> 
+I did all the testing and planning.
 
 ## What it changes
 
