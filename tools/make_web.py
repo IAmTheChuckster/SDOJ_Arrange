@@ -41,7 +41,7 @@ def main():
 
     mra_path = os.path.join(ROOT, 'patcher', 'SDOJ_Resurrected.mra')
     mra = open(mra_path).read()
-    mra = re.sub(r'(<part name="u4" crc=")[0-9a-fA-F]{8}', lambda m: m.group(1) + '%08x' % pcrc, mra)
+    mra = re.sub(r'(<part name="sdojdfk_u4" crc=")[0-9a-fA-F]{8}', lambda m: m.group(1) + '%08x' % pcrc, mra)
     open(mra_path, 'w').write(mra)
 
     html = open(os.path.join(ROOT, 'patcher', 'web_template.html')).read()

@@ -2,11 +2,11 @@
 """SDOJ Resurrected patcher (Python 3, standard library only).
 
 Usage:
-    python3 sdoj_patch.py ddpsdoj.zip [output.zip]
+    python3 sdoj_patch.py ddpsdoj.zip [ddpsdojdfk.zip]
 
 Reads your own ddpsdoj (DoDonPachi SaiDaiOuJou) ROM set, patches the program
-ROM u4 and writes a new zip (default: patched/ddpsdoj.zip). All other files are
-copied unchanged. The original ROM is not modified.
+ROM u4 and writes ddpsdojdfk.zip (default: patched/ddpsdojdfk.zip) with the
+patched u4 stored as sdojdfk_u4. All other files are copied unchanged. The original ROM is not modified.
 """
 import os, sys, zipfile, zlib
 
@@ -15,6 +15,7 @@ from sdoj_patch_data import CHANGES, ORIG_BOOT_LITERAL
 
 U4_SIZE = 4194560
 U4_CRC = 0xE2A4411C  # original ddpsdoj u4
+OUT_U4 = 'sdojdfk_u4'
 PATCHED_CRC = 0xC3BEA559  # set by tools/make_web.py
 
 
@@ -42,7 +43,7 @@ def main():
     if len(sys.argv) < 2:
         sys.exit(__doc__)
     src = sys.argv[1]
-    dst = sys.argv[2] if len(sys.argv) > 2 else os.path.join('patched', 'ddpsdoj.zip')
+    dst = sys.argv[2] if len(sys.argv) > 2 else os.path.join('patched', 'ddpsdojdfk.zip')
     with zipfile.ZipFile(src) as zin:
         names = zin.namelist()
         u4name = next((n for n in names if os.path.basename(n).lower() == 'u4'), None)
@@ -56,7 +57,10 @@ def main():
         os.makedirs(os.path.dirname(os.path.abspath(dst)), exist_ok=True)
         with zipfile.ZipFile(dst, 'w', zipfile.ZIP_DEFLATED) as zout:
             for n in names:
-                zout.writestr(n, new if n == u4name else zin.read(n))
+                if n == u4name:
+                    zout.writestr(os.path.join(os.path.dirname(n), OUT_U4), new)
+                else:
+                    zout.writestr(n, zin.read(n))
     nc = zlib.crc32(new) & 0xFFFFFFFF
     print('patched u4 CRC %08X%s' % (nc, '' if nc == PATCHED_CRC else ' (does not match release %08X!)' % PATCHED_CRC))
     print('wrote', dst)

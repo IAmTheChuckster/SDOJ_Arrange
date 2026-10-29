@@ -35,11 +35,11 @@
     <category>Shooter</category>
     <rbf>ikacore_CV1k</rbf>
 
-    <rom index="1" address="0x34400000" zip="ddpsdoj.zip" md5="none">
+    <rom index="1" address="0x34400000" zip="ddpsdojdfk.zip" md5="none">
         <part name="u2" crc="668e4cd6"/>
     </rom>
 
-    <rom index="2" address="0x3C800000" zip="ddpsdoj.zip" md5="none">
+    <rom index="2" address="0x3C800000" zip="ddpsdojdfk.zip" md5="none">
         <part name="u23" crc="ac94801c" length="0x400000"/>
         <part repeat="0x400000">00</part>
         <part name="u24" crc="f593045b" length="0x400000"/>
@@ -48,8 +48,8 @@
 
     <nvram index="3" size="135680"/>
 
-    <rom index="0" zip="ddpsdoj.zip" md5="none">
-        <part name="u4" crc="c3bea559" length="0x400000"/>
+    <rom index="0" zip="ddpsdojdfk.zip" md5="none">
+        <part name="sdojdfk_u4" crc="c3bea559" length="0x400000"/>
     </rom>
 
     <buttons names="Laser,Bomb/Hyper,Rapid Shot,Bomb,Start,Coin,Test,Service,Save State" default="A,B,X,Y,Start,R,L,Select"/>

@@ -73,7 +73,7 @@ footer { color: var(--muted); font-size: 13px; text-align: center; }
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">DoDonPachi SaiDaiOuJou · Cave CV1000-D · build 4</div>
+    <div class="eyebrow">DoDonPachi SaiDaiOuJou · Cave CV1000-D · build 5</div>
     <h1>SDOJ Resurrected Patcher</h1>
     <div class="privacy"><span class="dot"></span>Everything runs in your browser. Your ROMs are never uploaded.</div>
   </header>
@@ -102,15 +102,15 @@ footer { color: var(--muted); font-size: 13px; text-align: center; }
     <div class="progress" aria-hidden="true"><div id="bar"></div></div>
     <div class="tablebox"><table>
       <thead><tr><th>File</th><th>Expected CRC32</th><th>Built CRC32</th><th>Status</th></tr></thead>
-      <tbody><tr><td class="mono">u4<span class="role">Patched program ROM</span></td><td class="mono">c3bea559</td><td class="mono" id="outcrc">—</td><td><span class="pill" id="outstatus">Waiting</span></td></tr></tbody>
+      <tbody><tr><td class="mono">sdojdfk_u4<span class="role">Patched program ROM (replaces u4)</span></td><td class="mono">c3bea559</td><td class="mono" id="outcrc">—</td><td><span class="pill" id="outstatus">Waiting</span></td></tr></tbody>
     </table></div>
     <div class="buttons">
-      <button id="btnSet" disabled>Download ddpsdoj.zip (patched)</button>
+      <button id="btnSet" disabled>Download ddpsdojdfk.zip</button>
       <button id="btnMra" class="secondary" disabled>SDOJ_Resurrected.mra</button>
-      <button id="btnU4zip" class="secondary" disabled>u4.zip</button>
-      <button id="btnU4" class="secondary" disabled hidden>u4</button>
+      <button id="btnU4zip" class="secondary" disabled>sdojdfk_u4.zip</button>
+      <button id="btnU4" class="secondary" disabled hidden>sdojdfk_u4</button>
     </div>
-    <p class="hint" id="dlhint">The patched ddpsdoj.zip is the full set with u4 patched; u2, u23 and u24 are copied unchanged. It keeps the name ddpsdoj.zip, so keep a backup of your original set. For MiSTer, put it in your games folder and SDOJ_Resurrected.mra in _Arcade; the .mra u4 CRC matches this build. For MAME 0.289, use it as ddpsdoj.zip (MAME warns about the u4 checksum, that is expected). For a real board, flash the patched u4 and back up your original u4 first.</p>
+    <p class="hint" id="dlhint">ddpsdojdfk.zip is the full set with u4 replaced by sdojdfk_u4; u2, u23 and u24 are copied unchanged. For MiSTer, put ddpsdojdfk.zip in your games folder and SDOJ_Resurrected.mra in _Arcade; its sdojdfk_u4 CRC matches this build. For a real board, flash sdojdfk_u4 as u4, and back up your original u4 first.</p>
     <p class="msg" id="dlmsg"></p>
   </section>
 
@@ -121,9 +121,9 @@ footer { color: var(--muted); font-size: 13px; text-align: center; }
 (() => {
   const ORIG_CRC = 0xe2a4411c, PATCHED_CRC = 0xc3bea559, U4_SIZE = 4194560;
   const PATCH = [[472, "PqAAAA=="], [4063232, "C9EM0gzTFmACIhBD+48EcgvHA2EWYigiBokWYxZkImUwNfeL9q9CIgTQK0AJAAkAPqAAEOAMAAAAAAcBHgzQQCIMRBMiDHAQ4AwAASIM1CIiDHAQ4AwAASIMiCwiDHAQ4AwAASIMrBIdDNzU4AxkASIMCBMdDNzU4AxkASIMtBIdDJDZ4AyuASEMDBwhDAAm4AwAAiEMHCkfDNCg4AxKAh8McG4fDECN4AxcAicM/K8fDECN4AxcAicMMMcfDECN4AxcAicMuNEfDECN4AxcAh8MBGwfDCCj4Ay0AiAM5LMfDCCj4Ay0AiAMNLQfDCCj4Ay0AiEMDKwfDCCj4Ay0AiIMrKofDCCj4Ay0AiIMMKAiDPCo4AxUAwAAAAA="], [4067328, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACJPRi8z0TTSImAIIAmLAOACERVSKCICif9yH6AlER2gABEB4AIRUpAFESzSImMUVTQRV2VZIxFQM2UB5mglA4n/cBFAAIkC4ALmaCUEiQFwAuZnMACLAOABEQAR9mQg0CtAJk8b0RJQCCAdiRFSHdACNwWLHNACNwKJAOMMoAkAGtACNxCLGtACNw2JAeMdkAM1AYsC4wh1M2AMMCAzAIkBcAhAE9EeBxPQK0AJAAnRElAIIAeJC5ADNQSLCZAHNQGJCwAJAA3QK0AJAMwA8AC2ALoA4AwAAB4MLBEdDGzNIgxwEDAMkNUwDNjVMQwAXzEMwF/gDLwDHQzc1B0MkNko0QDgAxEQUAGIG4tDYnByImIoIg+JJ4QRQAyLBuMzMAmJCDMG4CeAJoQ8MAbjNzAAiwbgJoBjYIDIA4kgywNmAeADERjQK0AJABbRE1AIIAGJCwAA4BXQK0AJACJPhi9DaBPQC0AJAA7REFIB4zAyEYtk4zAwDokRkYwxEmIoIgmJBeM3MgWJFOM+IhoAB5MBoDwwBZD2aCZPCwAJAOwCtAAsAeAMAAAhDAAmHwzQoB8MQI060RBQAYgGi2mQTgAIIAWLU2BcNQw1NtArQAkAIk+GL5Yvpi+2L0NoU2ljajDQC0AJAANrk2KjYAOIGYkIIBOLTpCOAATjNjAAiwTgCEAs0z4CRpCOAArjNjAAiwrgCEAo0z4DPDIjaZNik2M8MzwyOJCOAywzNpInMwiLNJIoMzYIg2Qc0AtAAeUBoAkANgizYPZr9mr2afZoJk8LAAkAIk+GL0JYE9ALQAkABi8P0RBSAeMwMg2LiCgLiRGQjgIK4zMyAYkBciYIIOSDZQvQC0AB5vZg9mgmTwsACQDgArwD5AL4Av8BAAIJAOAMAAAfDCCjIgzwqB8M0KcfDEDQMwxIiDMMHIjgDNQD4AzdA+AM5gPgDO0D4Az0A+AMCAQgPlJBQUNFRCAAQSBDUkRBAEUgPi4xKzUgADEgNS4AKyA+RFNKT1IgU0VSVUVSVENPSQBOICBEU0pPUiBTRVJVRVJUQ09JAE4="]];
-  const OUT_NAME = "u4", SET_NAME = "ddpsdoj.zip", MRA_NAME = "SDOJ_Resurrected.mra";
+  const OUT_NAME = "sdojdfk_u4", SET_NAME = "ddpsdojdfk.zip", MRA_NAME = "SDOJ_Resurrected.mra";
   // MiSTer MRA; the u4 CRC is set from PATCHED_CRC when it is saved.
-  const MRA = "<!--\n  ikacore_CV1k MRA - SDOJ Resurrected (2012/ 4/20).\n  \n  Rom order is deliberate - DDR3 first, index 0 LAST.  Index 0's download\n  is what finally releases the CPU, so every image is in place before the\n  core runs, and any spurious run in an inter-rom gap is wiped by the u4\n  download's own reset hold.\n\n    <rom index=\"1\">  DDR3 0x34000000  u2  NAND dump incl. spare (132 MiB,\n                                          exact size)\n    <rom index=\"2\">  DDR3 0x3D000000  u23 YMZ chip 0, zero-padded to the\n                                          8 MiB slot\n                     DDR3 0x3D800000  u24 YMZ chip 1, zero-padded to the\n                                          8 MiB slot\n    <rom index=\"0\">  ioctl stream     u4  program NOR x1 (a real 4 MiB\n                                          flash, like ddpsdoj - unlike\n                                          the 2 MiB-mirrored CV1000-B\n                                          dumps, which ship u4 twice)\n\n  The DDR3 image is byte-for-byte what the old single stream produced:\n  the CV1k_ioctl packer laid those regions out as verbatim linear copies\n  of the dump files at exactly these addresses (srcs/rtl/CV1k_ioctl.sv),\n  so a memcpy reproduces it.  The zero pads are kept for that reason.\n\n  All parts stream RAW file bytes - byte-pair order is handled inside the\n  core (NOR_BSWAP=0 assembles {odd,even}; MAME dumps stream as stored).\n  <rbf> must match the deployed rbf base name.\n-->\n<misterromdescription>\n    <about author=\"ika-musume\" source=\"https://github.com/ika-musume/ikacore_CV1k\"/>\n    <name>SDOJ Resurrected (2012/ 4/20)</name>\n    <setname>ddpsdoj</setname>\n    <year>2012</year>\n    <manufacturer>Cave</manufacturer>\n    <category>Shooter</category>\n    <rbf>ikacore_CV1k</rbf>\n\n    <rom index=\"1\" address=\"0x34400000\" zip=\"ddpsdoj.zip\" md5=\"none\">\n        <part name=\"u2\" crc=\"668e4cd6\"/>\n    </rom>\n\n    <rom index=\"2\" address=\"0x3C800000\" zip=\"ddpsdoj.zip\" md5=\"none\">\n        <part name=\"u23\" crc=\"ac94801c\" length=\"0x400000\"/>\n        <part repeat=\"0x400000\">00</part>\n        <part name=\"u24\" crc=\"f593045b\" length=\"0x400000\"/>\n        <part repeat=\"0x400000\">00</part>\n    </rom>\n\n    <nvram index=\"3\" size=\"135680\"/>\n\n    <rom index=\"0\" zip=\"ddpsdoj.zip\" md5=\"none\">\n        <part name=\"u4\" crc=\"c3bea559\" length=\"0x400000\"/>\n    </rom>\n\n    <buttons names=\"Laser,Bomb/Hyper,Rapid Shot,Bomb,Start,Coin,Test,Service,Save State\" default=\"A,B,X,Y,Start,R,L,Select\"/>\n</misterromdescription>\n";
+  const MRA = "<!--\n  ikacore_CV1k MRA - SDOJ Resurrected (2012/ 4/20).\n  \n  Rom order is deliberate - DDR3 first, index 0 LAST.  Index 0's download\n  is what finally releases the CPU, so every image is in place before the\n  core runs, and any spurious run in an inter-rom gap is wiped by the u4\n  download's own reset hold.\n\n    <rom index=\"1\">  DDR3 0x34000000  u2  NAND dump incl. spare (132 MiB,\n                                          exact size)\n    <rom index=\"2\">  DDR3 0x3D000000  u23 YMZ chip 0, zero-padded to the\n                                          8 MiB slot\n                     DDR3 0x3D800000  u24 YMZ chip 1, zero-padded to the\n                                          8 MiB slot\n    <rom index=\"0\">  ioctl stream     u4  program NOR x1 (a real 4 MiB\n                                          flash, like ddpsdoj - unlike\n                                          the 2 MiB-mirrored CV1000-B\n                                          dumps, which ship u4 twice)\n\n  The DDR3 image is byte-for-byte what the old single stream produced:\n  the CV1k_ioctl packer laid those regions out as verbatim linear copies\n  of the dump files at exactly these addresses (srcs/rtl/CV1k_ioctl.sv),\n  so a memcpy reproduces it.  The zero pads are kept for that reason.\n\n  All parts stream RAW file bytes - byte-pair order is handled inside the\n  core (NOR_BSWAP=0 assembles {odd,even}; MAME dumps stream as stored).\n  <rbf> must match the deployed rbf base name.\n-->\n<misterromdescription>\n    <about author=\"ika-musume\" source=\"https://github.com/ika-musume/ikacore_CV1k\"/>\n    <name>SDOJ Resurrected (2012/ 4/20)</name>\n    <setname>ddpsdoj</setname>\n    <year>2012</year>\n    <manufacturer>Cave</manufacturer>\n    <category>Shooter</category>\n    <rbf>ikacore_CV1k</rbf>\n\n    <rom index=\"1\" address=\"0x34400000\" zip=\"ddpsdojdfk.zip\" md5=\"none\">\n        <part name=\"u2\" crc=\"668e4cd6\"/>\n    </rom>\n\n    <rom index=\"2\" address=\"0x3C800000\" zip=\"ddpsdojdfk.zip\" md5=\"none\">\n        <part name=\"u23\" crc=\"ac94801c\" length=\"0x400000\"/>\n        <part repeat=\"0x400000\">00</part>\n        <part name=\"u24\" crc=\"f593045b\" length=\"0x400000\"/>\n        <part repeat=\"0x400000\">00</part>\n    </rom>\n\n    <nvram index=\"3\" size=\"135680\"/>\n\n    <rom index=\"0\" zip=\"ddpsdojdfk.zip\" md5=\"none\">\n        <part name=\"sdojdfk_u4\" crc=\"c3bea559\" length=\"0x400000\"/>\n    </rom>\n\n    <buttons names=\"Laser,Bomb/Hyper,Rapid Shot,Bomb,Start,Coin,Test,Service,Save State\" default=\"A,B,X,Y,Start,R,L,Select\"/>\n</misterromdescription>\n";
   const SET = [
     { name: "u4",  size: 4194560,   crc: 0xe2a4411c, role: "Patched" },
     { name: "u2",  size: 138412032, crc: 0x668e4cd6, role: "Copied unchanged" },
@@ -204,7 +204,7 @@ footer { color: var(--muted); font-size: 13px; text-align: center; }
   }
 
   const state = { entries: null, u4Entry: null, loose: {}, patched: null };
-  const base = n => n.split(/[\\/]/).pop().toLowerCase();
+  const base = n => { const b = n.split(/[\\/]/).pop().toLowerCase(); return b === OUT_NAME ? "u4" : b; };
   const bar = v => { $("bar").style.width = Math.round(v * 100) + "%"; };
 
   function pill(cls, text) { return `<span class="pill ${cls}">${text}</span>`; }
@@ -275,12 +275,12 @@ footer { color: var(--muted); font-size: 13px; text-align: center; }
     const oc = crc32(out); bar(.8);
     $("outcrc").textContent = hex(oc);
     if (oc !== PATCHED_CRC) { $("outstatus").className = "pill err"; $("outstatus").textContent = "Wrong CRC"; return fail("The patched u4 came out with CRC " + hex(oc) + " instead of " + hex(PATCHED_CRC) + ", so nothing was offered for download."); }
-    $("outstatus").className = "pill ok"; $("outstatus").textContent = "Matches build 4";
+    $("outstatus").className = "pill ok"; $("outstatus").textContent = "Matches build 5";
     $("checkmsg").textContent = "Original u4 found (CRC " + hex(ORIG_CRC) + ") and patched.";
     state.patched = out; bar(1);
     $("btnU4zip").disabled = false; $("btnU4").disabled = false; $("btnMra").disabled = false;
     $("btnSet").disabled = !state.entries;
-    if (!state.entries) $("dlmsg").textContent = "The patched ddpsdoj.zip needs the original ddpsdoj.zip as input; you loaded a loose u4, so only the patched u4 and the .mra are available.";
+    if (!state.entries) $("dlmsg").textContent = "ddpsdojdfk.zip needs the original ddpsdoj.zip as input; you loaded a loose u4, so only sdojdfk_u4 and the .mra are available.";
   }
 
   const dosNow = () => ({ time: 0, date: (2026 - 1980) << 9 | 10 << 5 | 14 });
@@ -316,7 +316,7 @@ footer { color: var(--muted); font-size: 13px; text-align: center; }
     }
   }
   $("btnSet").onclick = async () => { $("btnSet").disabled = true; try { await save(SET_NAME, await makeSet()); } finally { $("btnSet").disabled = false; } };
-  $("btnMra").onclick = () => save(MRA_NAME, new Blob([MRA.replace(/(<part name="u4" crc=")[0-9a-fA-F]{8}/g, (m, p) => p + hex(PATCHED_CRC))], { type: "application/xml" }));
+  $("btnMra").onclick = () => save(MRA_NAME, new Blob([MRA.replace(/(<part name="sdojdfk_u4" crc=")[0-9a-fA-F]{8}/g, (m, p) => p + hex(PATCHED_CRC))], { type: "application/xml" }));
   $("btnU4zip").onclick = async () => save(OUT_NAME + ".zip", buildZip([await u4Item()]));
   $("btnU4").onclick = () => save(OUT_NAME, new Blob([state.patched], { type: "application/octet-stream" }));
 
