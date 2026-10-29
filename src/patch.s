@@ -20,6 +20,9 @@ v_inbee:    .long 0     ! 1 while the bee pickup routine runs (1.5+)
 v_beeobj:   .long 0     ! bee pickup object (its +0xD8 is the % shown)
 v_popup:    .long 0     ! 1 if the bee % popup was shown
 v_hcnt:     .long 0     ! laser-hit counter during hyper (every 3rd hit counts)
+v_lastdeaths: .long 0   ! player deaths seen last frame (1.5+ bombs)
+v_lastbombs: .long 0    ! player bombs seen last frame
+v_gpfix:    .long 0     ! GP bonus fixed at hyper start (0 = not set)
 
         .org 0x100
 ! ---------------------------------------------------------------- game addresses
@@ -207,6 +210,7 @@ trybomb_hook:
         cmp/eq  #1,r0
         bf      tb_go
         ! --- 1.5+: max bombs 6 for every dress type
+        mov.l   r5,@-r15            ! keep the held-input argument
         mov     r4,r2
         add     #0x70,r2
         mov.l   @r2,r2              ! player
@@ -215,24 +219,38 @@ trybomb_hook:
         ! --- 1.5+: always play as Expert (+0x10 = 2); the dress look (+0x14 ...) is kept
         mov     #2,r0
         mov.l   r0,@(16,r2)
+        ! --- 1.5+ bombs: always 6 slots, start with 3, each death gives +1 bomb
+        mov.w   w_3bb,r0
+        mov.b   @(r0,r2),r3         ! deaths
+        extu.b  r3,r3
+        mov.l   @(48,r1),r0         ! deaths last frame
+        cmp/hi  r0,r3
+        bf      tb_nodeath
+        mov.l   @(52,r1),r0         ! bombs before the death
+        add     #1,r0
+        bra     tb_setb
+        nop
+tb_nodeath:
         mov.b   @(7,r2),r0          ! max bombs
-        cmp/pz  r0
-        bf      tb_btn
-        mov     #6,r3
-        cmp/ge  r3,r0
-        bt      tb_btn
-        sub     r0,r3               ! r3 = 6 - max (extra slots)
+        cmp/eq  #6,r0
+        bt      tb_keep
+        mov     #3,r0               ! new game / continue: 3 bombs
+tb_setb:
+        mov     #6,r5
+        cmp/gt  r5,r0
+        bf      tb_set2
+        mov     #6,r0
+tb_set2:
+        mov.b   r0,@(6,r2)
         mov     #6,r0
         mov.b   r0,@(7,r2)
+tb_keep:
+        mov.l   r3,@(48,r1)
         mov.b   @(6,r2),r0
-        add     r3,r0
-        mov     #6,r3
-        cmp/gt  r3,r0
-        bf      tb_bset
-        mov     #6,r0
-tb_bset:
-        mov.b   r0,@(6,r2)
+        extu.b  r0,r0
+        mov.l   r0,@(52,r1)
 tb_btn:
+        mov.l   @r15+,r5
         ! --- 1.5+: button 4 (0x80) = bomb only
         mov     r6,r0
         tst     #0x80,r0
@@ -261,7 +279,8 @@ ah_go:
         nop
 
 ! ================================================================ GP bonus hook
-! 1.5+: hyper GP bonus by hyper level: L1 2.0, L2 2.2, L3 2.4, L4 2.6, L5 2.8, L6-10 3.0
+! 1.5+: hyper GP bonus by hyper level: L1 2.0, L2 2.2, L3 2.4, L4 2.6, L5 2.8, L6-10 3.0,
+! set when the hyper starts and kept until it ends.
         .global gp_hook
 gp_hook:
         sts.l   pr,@-r15
@@ -277,7 +296,17 @@ gp_hook:
         bf      gp_ret
         mov     #100,r3
         cmp/eq  r3,r0
-        bt      gp_ret              ! not boosted -> 1.0
+        bf      gp_boost
+        mov     #0,r2
+        bra     gp_ret              ! not boosted -> 1.0, clear the fixed value
+        mov.l   r2,@(56,r1)
+gp_boost:
+        mov.l   @(56,r1),r2         ! already fixed for this hyper?
+        tst     r2,r2
+        bt      gp_calc
+        bra     gp_ret
+        mov     r2,r0
+gp_calc:
         mov.w   w_2ec,r1
         add     r8,r1
         mov.l   @r1,r2              ! stocks spent at hyper start
@@ -285,7 +314,7 @@ gp_hook:
         mov.l   @r1,r3              ! +0x2E8: HYPER Lv gained during the hyper (HUD)
         add     r3,r2               ! hyper level = start level + level-ups
         tst     r2,r2
-        bt      gp_ret
+        bt      gp_store
         mov     #5,r3
         cmp/gt  r3,r2
         bt      gp_max
@@ -293,10 +322,13 @@ gp_hook:
         mulu.w  r3,r2
         sts     macl,r0
         mov.w   w_180,r3
-        bra     gp_ret
+        bra     gp_store
         add     r3,r0
 gp_max:
         mov.w   w_300,r0
+gp_store:
+        mov.l   l2_vars0,r1
+        mov.l   r0,@(56,r1)         ! GP stays at this value until the hyper ends
 gp_ret:
         mov.l   @r15+,r8
         lds.l   @r15+,pr
@@ -305,6 +337,7 @@ gp_ret:
 
         .align 1
 w_2ec:  .word 0x2EC
+w_3bb:  .word 0x3BB
 w_180:  .word 180
 w_300:  .word 300
         .align 2
@@ -735,6 +768,38 @@ s_bmgr:    .long 0x0C4C8978
 s_mgroff:  .long 0x00030DFC
 s_rad:     .long 0x000A0000     ! 10 px
 s_cancel1: .long 0x0C1FE220     ! cancel bullets in the manager list (flag, player)
+
+! ================================================================ bomb item (1.5+)
+! 0x0C1F7D50 is called by the bomb item pickup (literal 0x0C22A508): cancel bullets into big stars.
+        .global bombitem_hook
+bombitem_hook:
+        sts.l   pr,@-r15
+        mov.l   r8,@-r15
+        mov.l   r9,@-r15
+        mov     r4,r8
+        mov.l   bi_orig,r0
+        jsr     @r0
+        nop
+        mov     r0,r9
+        mov.l   bi_vars,r1
+        mov.l   @r1,r0
+        cmp/eq  #1,r0
+        bf      bi_ret
+        mov     #32,r4
+        mov     r8,r5
+        mov.l   bi_cancel,r0
+        jsr     @r0
+        mov     #1,r6
+bi_ret: mov     r9,r0
+        mov.l   @r15+,r9
+        mov.l   @r15+,r8
+        lds.l   @r15+,pr
+        rts
+        nop
+        .align 2
+bi_vars:   .long v_mode
+bi_orig:   .long 0x0C1F7D50
+bi_cancel: .long CANCEL
 
 ! ================================================================ menu text
         .align 2

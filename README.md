@@ -31,9 +31,10 @@ Use **Up / Down** to move the arrow and press **START** to play the selected mod
 ### 1.5+ mode
 - **Buttons**: buttons 1-3 work as in Arcade (button 2 = bomb, or hyper when a hyper is ready). **Button 4 = bomb only**, so with a hyper ready you can bomb with button 4 and press button 2 during the bomb to go into hyper.
 - **Expert weapon**: every dress uses the Expert shot and laser. You still pick your ship and dress, but the dress only changes the look.
-- **Bombs**: maximum bombs raised to **6** for every dress type (shot, laser, expert); you start with 6.
+- **Bombs**: **6 bomb slots** for every dress type; you start with **3 bombs** and each death gives **+1 bomb** (up to 6).
+- **Bomb items** cancel all bullets on screen into big stars.
 - **Hyper meter** fills **3 times as fast** as Arcade outside hyper (death bonus unchanged). During a hyper it keeps filling at the normal Arcade amounts; each full bar raises **HYPER Lv** by 1, and what is left shows again when the hyper ends.
-- **GP bonus during hyper** by hyper level (hypers spent to start it + HYPER Lv gained during it): Lv1 x2.0, Lv2 x2.2, Lv3 x2.4, Lv4 x2.6, Lv5 x2.8, Lv6-10 x3.0 (Arcade: x1.1-x1.5, then x2.2-x3.0, from hypers spent only).
+- **GP bonus during hyper** by the hyper level at the start of the hyper (hypers spent): Lv1 x2.0, Lv2 x2.2, Lv3 x2.4, Lv4 x2.6, Lv5 x2.8, Lv6-10 x3.0 (Arcade: x1.1-x1.5, then x2.2-x3.0). It stays the same until the hyper ends, even if HYPER Lv goes up.
 - **Hidden bees**: every hidden bee shows **+100%** and gives exactly **one hyper** (max 10; no combo-based meter gain). During a hyper it raises **HYPER Lv** by 1 instead (HUD digit and GP bonus update). Every bee also cancels all bullets into big stars.
 - **Shot cancels bullets during hyper**: while a hyper is active, enemy bullets touched by your shot (not the laser) are cancelled into big stars.
 
