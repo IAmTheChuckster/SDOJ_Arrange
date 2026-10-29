@@ -42,9 +42,9 @@ You need your own `ddpsdoj.zip` (MAME set, u4 CRC `e2a4411c`). The patched u4 ha
 
 The patched set is `ddpsdojdfk.zip`, with the patched u4 stored as `sdojdfk_u4`.
 
-**Browser:** open `patcher/index.html` (or the GitHub Pages copy), drop `ddpsdoj.zip` on it and download `ddpsdojdfk.zip`, the MiSTer `SDOJ_Resurrected.mra`, or `sdojdfk_u4` alone. Everything runs locally in the browser.
+**Browser:** open `patcher/index.html` (or the GitHub Pages copy), drop `ddpsdoj.zip` on it and download `ddpsdojdfk.zip`, the MiSTer `SDOJ Resurrected.mra`, or `sdojdfk_u4` alone. Everything runs locally in the browser.
 
-**MiSTer:** put `ddpsdojdfk.zip` in your games folder and `patcher/SDOJ_Resurrected.mra` in `_Arcade`.
+**MiSTer:** put `ddpsdojdfk.zip` in your games folder and `patcher/SDOJ Resurrected.mra` in `_Arcade`.
 
 **Python 3** (no extra packages):
 
