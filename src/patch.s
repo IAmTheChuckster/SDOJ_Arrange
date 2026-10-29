@@ -19,6 +19,7 @@ v_sy:       .long 0     ! current shot y (16.16)
 v_inbee:    .long 0     ! 1 while the bee pickup routine runs (1.5+)
 v_beeobj:   .long 0     ! bee pickup object (its +0xD8 is the % shown)
 v_popup:    .long 0     ! 1 if the bee % popup was shown
+v_hcnt:     .long 0     ! laser-hit counter during hyper (every 3rd hit counts)
 
         .org 0x100
 ! ---------------------------------------------------------------- game addresses
@@ -313,7 +314,8 @@ l2_orig_acthyp:  .long ORIG_ACTHYP
 l2_orig_gp:      .long ORIG_GP
 
 ! ================================================================ gauge event hook
-! p r4, amount r5, type r6.  1.5+: gauge fills 3x outside hyper; during hyper as Arcade.
+! p r4, amount r5, type r6.  1.5+: gauge fills 3x outside hyper; during hyper it keeps
+! filling at the normal Arcade amounts (x1) and raises HYPER Lv.
 ! During a bee pickup in 1.5+ the bee's own combo-based gauge gain is skipped.
         .global kill_hook
 kill_hook:
@@ -330,13 +332,80 @@ kh_nobee:
         mov.w   w3_2e0,r0
         mov.l   @(r0,r4),r0         ! hyper active?
         tst     r0,r0
-        bf      kh_orig             ! in hyper: Arcade rate
+        bf      kh_hyper            ! in hyper
         mov     r5,r0               ! not in hyper: amount * 3
         add     r5,r5
         add     r0,r5
 kh_orig:
         mov.l   l3_orig_kill,r0
         jmp     @r0
+        nop
+kh_hyper:
+        sts.l   pr,@-r15
+        mov.l   r8,@-r15
+        mov.l   r9,@-r15
+        mov.l   r10,@-r15
+        mov.l   r11,@-r15
+        mov     r4,r8
+        mov     r5,r9
+        mov     r6,r10
+        mov.l   l3_orig_kill,r0
+        jsr     @r0                 ! the game's own in-hyper handling
+        nop
+        mov     r0,r11
+        ! amount Arcade would give outside hyper (x1)
+        mov     r10,r0
+        cmp/eq  #3,r0
+        bf      kh_t0
+        mov.l   l3_vars0,r1         ! laser hits: +amount every 3rd hit
+        mov.l   @(44,r1),r0
+        add     #1,r0
+        mov     #3,r2
+        cmp/ge  r2,r0
+        bt      kh_t3
+        bra     kh_done
+        mov.l   r0,@(44,r1)
+kh_t3:  mov     #0,r0
+        mov.l   r0,@(44,r1)
+        bra     kh_add
+        mov     r9,r2
+kh_t0:  tst     r0,r0
+        bf      kh_other
+        mov.w   w3_3bc,r0           ! kills: A[deaths] + B[stock]
+        mov.l   @(r0,r8),r0
+        mov     #4,r3
+        cmp/hi  r3,r0
+        bf      kh_a
+        mov     #4,r0
+kh_a:   shll2   r0
+        mov.l   l3_tblA,r3
+        mov.l   @(r0,r3),r2
+        mov.w   w3_2e4,r0
+        mov.l   @(r0,r8),r0
+        mov     #10,r3
+        cmp/hi  r3,r0
+        bf      kh_b
+        mov     #10,r0
+kh_b:   shll2   r0
+        mov.l   l3_tblB,r3
+        mov.l   @(r0,r3),r3
+        bra     kh_add
+        add     r3,r2
+kh_other:
+        mov     r9,r2
+kh_add:
+        mov     r8,r4               ! 0x0C1FA490: in-hyper meter, full bar -> HYPER Lv +1
+        mov.l   l3_hyplv,r0
+        jsr     @r0
+        mov     r2,r5
+kh_done:
+        mov     r11,r0
+        mov.l   @r15+,r11
+        mov.l   @r15+,r10
+        mov.l   @r15+,r9
+        mov.l   @r15+,r8
+        lds.l   @r15+,pr
+        rts
         nop
 
 ! ================================================================ hidden bee hook

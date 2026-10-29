@@ -16,7 +16,7 @@ from sdoj_patch_data import CHANGES, ORIG_BOOT_LITERAL
 U4_SIZE = 4194560
 U4_CRC = 0xE2A4411C  # original ddpsdoj u4
 OUT_U4 = 'sdojdfk_u4'
-PATCHED_CRC = 0x7192B62C  # set by tools/make_web.py
+PATCHED_CRC = 0xBB1A5578  # set by tools/make_web.py
 
 
 def swap16(b):
