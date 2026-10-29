@@ -15,6 +15,7 @@ from sdoj_patch_data import CHANGES, ORIG_BOOT_LITERAL
 
 U4_SIZE = 4194560
 U4_CRC = 0xE2A4411C  # original ddpsdoj u4
+PATCHED_CRC = 0xC3BEA559  # set by tools/make_web.py
 
 
 def swap16(b):
@@ -56,7 +57,8 @@ def main():
         with zipfile.ZipFile(dst, 'w', zipfile.ZIP_DEFLATED) as zout:
             for n in names:
                 zout.writestr(n, new if n == u4name else zin.read(n))
-    print('patched u4 CRC %08X' % (zlib.crc32(new) & 0xFFFFFFFF))
+    nc = zlib.crc32(new) & 0xFFFFFFFF
+    print('patched u4 CRC %08X%s' % (nc, '' if nc == PATCHED_CRC else ' (does not match release %08X!)' % PATCHED_CRC))
     print('wrote', dst)
 
 

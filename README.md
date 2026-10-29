@@ -38,7 +38,13 @@ Use **Up / Down** to move the arrow and press **START** to play the selected mod
 - **Hidden bees**: every hidden bee cancels all bullets into big stars and adds **+1 hyper** (max 10).
 
 ## Patching the game
-You need your own `ddpsdoj.zip` (MAME set, u4 CRC `E2A4411C`). Python 3, no extra packages:
+You need your own `ddpsdoj.zip` (MAME set, u4 CRC `e2a4411c`). The patched u4 has CRC `c3bea559`.
+
+**Browser:** open `patcher/index.html` (or the GitHub Pages copy), drop `ddpsdoj.zip` on it and download the patched `ddpsdoj.zip`, the MiSTer `SDOJ_Resurrected.mra`, or the patched `u4` alone. Everything runs locally in the browser.
+
+**MiSTer:** put the patched `ddpsdoj.zip` in your games folder and `patcher/SDOJ_Resurrected.mra` in `_Arcade` (the patched zip keeps the name `ddpsdoj.zip`, so keep a backup of the original).
+
+**Python 3** (no extra packages):
 
 ```
 python3 patcher/sdoj_patch.py ddpsdoj.zip patched/ddpsdoj.zip
@@ -46,7 +52,7 @@ python3 patcher/sdoj_patch.py ddpsdoj.zip patched/ddpsdoj.zip
 
 Only `u4` changes; all other files are copied as they are. Use the output as `ddpsdoj.zip` in your MAME 0.289 roms folder (MAME will warn about the changed u4 checksum - that is expected).
 
-Developers: `src/patch.s` is the SH-3 source; `python3 tools/build.py` (needs SH binutils such as `binutils-sh4-linux-gnu`) regenerates `patcher/sdoj_patch_data.py`. The patch adds a small boot loader in unused u4 space that copies the new code to free work RAM (0x0CE00000) and redirects a few code pointers in the unpacked program. Research notes are in `docs/ddpsdoj-notes.md`.
+Developers: `src/patch.s` is the SH-3 source; `python3 tools/build.py` (needs SH binutils such as `binutils-sh4-linux-gnu`) regenerates `patcher/sdoj_patch_data.py`; then `python3 tools/make_web.py ddpsdoj.zip` regenerates `patcher/index.html` and the .mra CRC. The patch adds a small boot loader in unused u4 space that copies the new code to free work RAM (0x0CE00000) and redirects a few code pointers in the unpacked program. Research notes are in `docs/ddpsdoj-notes.md`.
 
 ## Testing
 This patch was tested with MAME 0.289 and [CV1k core for the MiSTer FPGA by Raki](https://www.patreon.com/c/ikamusume/posts)<br>
