@@ -14,7 +14,7 @@ I did all the testing and planning.
 ## What it changes
 
 ### Mode select (title screen)
-After inserting a coin, the rank and 1st/2nd extend lines on the title are replaced by a mode menu:
+As soon as a coin is inserted, the title shows a mode menu in place of the rank and 1st/2nd extend lines:
 
 ```
 > ARCADE
@@ -33,8 +33,8 @@ Use **Up / Down** to move the arrow and press **START** to play the selected mod
 ### 1.5+ mode
 - **Buttons**: buttons 1-3 work as in Arcade (button 2 = bomb, or hyper when a hyper is ready). **Button 4 = bomb only**, so with a hyper ready you can bomb with button 4 and press button 2 during the bomb to go into hyper.
 - **Bombs**: maximum bombs raised to **6** for every dress type (shot, laser, expert); you start with 6.
-- **Hyper meter** fills **3 times as fast** as Arcade (death bonus unchanged), and **keeps filling during hyper** (the meter is shown again when the hyper ends; a full meter drops a hyper item).
-- **GP bonus during hyper** by hyper level: Lv1 x2.0, Lv2 x2.2, Lv3 x2.4, Lv4 x2.6, Lv5 x2.8, Lv6-10 x3.0 (Arcade: x1.1-x1.5, then x2.2-x3.0).
+- **Hyper meter** fills **3 times as fast** as Arcade (death bonus unchanged), and **keeps filling during hyper**: filling it during a hyper raises the HUD **HYPER Lv** (as in Arcade, just faster).
+- **GP bonus during hyper** by hyper level (hypers spent to start it + HYPER Lv gained during it): Lv1 x2.0, Lv2 x2.2, Lv3 x2.4, Lv4 x2.6, Lv5 x2.8, Lv6-10 x3.0 (Arcade: x1.1-x1.5, then x2.2-x3.0, from hypers spent only).
 - **Hidden bees**: every hidden bee cancels all bullets into big stars and adds **+1 hyper** (max 10).
 
 ## Patching the game

@@ -271,7 +271,10 @@ gp_hook:
         bt      gp_ret              ! not boosted -> 1.0
         mov.w   w_2ec,r1
         add     r8,r1
-        mov.l   @r1,r2              ! hyper level
+        mov.l   @r1,r2              ! stocks spent at hyper start
+        add     #-4,r1
+        mov.l   @r1,r3              ! +0x2E8: HYPER Lv gained during the hyper (HUD)
+        add     r3,r2               ! hyper level = start level + level-ups
         tst     r2,r2
         bt      gp_ret
         mov     #5,r3
