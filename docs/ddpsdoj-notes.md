@@ -29,7 +29,7 @@ Ship select: Type-A (Shuri, red), Type-B (Hikari, green), Type-C (Maria, blue), 
 |---|---|
 | +0x03 (byte) | lives (3 at start) |
 | +0x06 / +0x07 (byte) | bombs / max bombs (+1 max per death, capped by dress type: 6/4/2) |
-| +0x10 | dress type |
+| +0x10 | dress type for gameplay: 0 shot, 1 laser, 2 expert (read via 0x0C1F7824); +0x14/+0x24/+0x1C0 also differ per dress (look) |
 | +0x5C.. | score (big-number digits); pending score add at +0x54 |
 | +0x1FC | current combo (hit chain), +0x200 combo bonus, +0x254 max combo |
 | +0x2E0 | hyper active |

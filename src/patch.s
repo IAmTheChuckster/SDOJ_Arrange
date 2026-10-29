@@ -211,6 +211,9 @@ trybomb_hook:
         mov.l   @r2,r2              ! player
         tst     r2,r2
         bt      tb_btn
+        ! --- 1.5+: always play as Expert (+0x10 = 2); the dress look (+0x14 ...) is kept
+        mov     #2,r0
+        mov.l   r0,@(16,r2)
         mov.b   @(7,r2),r0          ! max bombs
         cmp/pz  r0
         bf      tb_btn
@@ -337,7 +340,8 @@ kh_orig:
         nop
 
 ! ================================================================ hidden bee hook
-! 1.5+: every bee shows 100%, gives exactly one hyper stock (no combo-based gauge)
+! 1.5+: every bee shows 100%, gives exactly one hyper stock - or HYPER Lv +1 during a
+! hyper - (no combo-based gauge)
 ! and cancels bullets into big stars.
         .global bee_hook
 bee_hook:
@@ -381,6 +385,22 @@ bee_arc:
         jsr     @r0
         mov     #1,r5
 bee_stock:
+        mov.w   w3_2e0,r0
+        mov.l   @(r0,r8),r0         ! in hyper?
+        tst     r0,r0
+        bt      bee_addstock
+        ! in hyper: HYPER Lv +1 (HUD digit, +0x2E8), max 10
+        mov     r8,r1
+        mov.w   w3_2e4,r0
+        add     r0,r1
+        mov.l   @(4,r1),r2          ! +0x2E8
+        mov     #10,r3
+        cmp/ge  r3,r2
+        bt      bee_cancel
+        add     #1,r2
+        bra     bee_cancel
+        mov.l   r2,@(4,r1)
+bee_addstock:
         mov.w   w3_2e4,r0
         mov.l   @(r0,r8),r2         ! hyper stock
         mov     #10,r3
