@@ -667,6 +667,60 @@ s_mgroff:  .long 0x00030DFC
 s_rad:     .long 0x000A0000     ! 10 px
 s_cancel1: .long 0x0C1FE220     ! cancel bullets in the manager list (flag, player)
 
+! ================================================================ dress select (1.5+)
+! The dress label/description show Expert for every dress (the costume still changes).
+! 0x0C274170 is the dress-select task; its data block (from 0x0C1E62E0(task id)) holds
+! the dress shown in the label at +0x1A8. The real choice is kept elsewhere.
+        .global dress_hook
+dress_hook:
+        sts.l   pr,@-r15
+        mov.l   r8,@-r15
+        mov.l   r9,@-r15
+        mov     r4,r8               ! task id
+        mov.l   d_vars,r1
+        mov.l   @r1,r9
+        add     #-1,r9              ! r9 == 0 -> 1.5+
+        tst     r9,r9
+        bf      dh_call
+        bsr     dh_force
+        nop
+dh_call:
+        mov.l   d_orig,r0
+        jsr     @r0
+        mov     r8,r4
+        tst     r9,r9
+        bf      dh_ret
+        mov.l   r0,@-r15
+        bsr     dh_force
+        nop
+        mov.l   @r15+,r0
+dh_ret:
+        mov.l   @r15+,r9
+        mov.l   @r15+,r8
+        lds.l   @r15+,pr
+        rts
+        nop
+dh_force:                           ! label dress := Expert (keeps pr via stack)
+        sts.l   pr,@-r15
+        mov.l   d_getdata,r0
+        jsr     @r0
+        mov     r8,r4
+        tst     r0,r0
+        bt      dh_f1
+        mov.w   d_off,r1
+        add     r1,r0
+        mov     #2,r1
+        mov.l   r1,@r0              ! +0x1A8: dress shown in the label
+dh_f1:  lds.l   @r15+,pr
+        rts
+        nop
+        .align 1
+d_off:     .word 0x1A8
+        .align 2
+d_vars:    .long v_mode
+d_orig:    .long 0x0C274170
+d_getdata: .long 0x0C1E62E0
+
 ! ================================================================ menu text
         .align 2
 strtab:    .long s_arc_on, s_arc_off, s_15_on, s_15_off, s_blank, s_blank

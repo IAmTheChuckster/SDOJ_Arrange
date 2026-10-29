@@ -77,6 +77,10 @@ GP bonus 0x0C1F6E70/0x0C27AFFC/0x0C27C730/0x0C27D1B8, GaugeEvent 0x0C1F6C04/0x0C
 0x0C21AC0C/0x0C22AAAC (death call 0x0C1F5E5C left alone), hidden bee 0x0C22A030.
 Variables at 0x0CE00000: mode (0 Arcade, 1 1.5+, 2 Resurrection), menu cursor, menu flag, no-hyper flag.
 
+## Dress select
+- Task 0x0C274170 (literal 0x0C274100); data block from 0x0C1E62E0(task id). Block +0x1A8 = dress shown in the label/description (display only); the costume and the real choice are kept separately.
+- Label/description images: tables 0x0C5B2740 / 0x0C5B2764 (ship*3 + dress; Expert entries are 0, drawn by a separate path).
+
 ## Objects, shots and bullets
 - Object groups are updated by 0x0C216A70: each object's update routine is at obj+0xD8, next object at obj+0xDC;
   position x/y at obj+0x48/+0x4C (16.16), velocity +0x50/+0x54 (y grows upwards).
