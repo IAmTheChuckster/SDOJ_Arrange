@@ -77,6 +77,16 @@ GP bonus 0x0C1F6E70/0x0C27AFFC/0x0C27C730/0x0C27D1B8, GaugeEvent 0x0C1F6C04/0x0C
 0x0C21AC0C/0x0C22AAAC (death call 0x0C1F5E5C left alone), hidden bee 0x0C22A030.
 Variables at 0x0CE00000: mode (0 Arcade, 1 1.5+, 2 Resurrection), menu cursor, menu flag, no-hyper flag.
 
+## Objects, shots and bullets
+- Object groups are updated by 0x0C216A70: each object's update routine is at obj+0xD8, next object at obj+0xDC;
+  position x/y at obj+0x48/+0x4C (16.16), velocity +0x50/+0x54 (y grows upwards).
+- Player shot update routines (4 per ship): Type-A 0x0C2173D0/217680/217A80/217DD0, Type-B 0x0C218160/2183C0/218770/2189F0,
+  Type-C 0x0C218D80/218FE0/2193E0/2196B0 (each installed via one literal). The laser uses other routines (0x0C21AA..).
+- Enemy bullets: list at [[0x0C4C8978]+0x30DFC]+0x14, next at +4, state +0 (2 = flying, 3 = cancelling),
+  x/y at +0x2C/+0x30. 0x0C1FE220 (flag, player) cancels every state 1/2 bullet in that list (flag 1 = big stars).
+- Hyper GP/HYPER Lv: +0x2E8 is the HUD HYPER Lv (level-ups during hyper via 0x0C1FA490); GP in 1.5+ uses +0x2EC + +0x2E8.
+- Chain x GP is computed in 32 bits (0x0C1F6ECC, 0x0C1F706E): it overflows above 2^31 / percent (original game; left as is).
+
 ## Open questions
 - Exact meaning of the type 0 "hit milestone" counter (every 21 hits) vs. kill events.
 - Bee chain completion rules (+0x384 > 7).

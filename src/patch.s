@@ -14,6 +14,8 @@ v_menu:     .long 0     ! 1 while the mode menu is shown on the title
 v_nohyp:    .long 0     ! 1 = this bomb press must not start a hyper (button 4)
 v_prevheld: .long 0     ! P1 held bits last title frame (edge detect)
 v_grace:    .long 0     ! title frames without credit before the mode falls back to Arcade
+v_sx:       .long 0     ! current shot x (16.16)
+v_sy:       .long 0     ! current shot y (16.16)
 
         .org 0x100
 ! ---------------------------------------------------------------- game addresses
@@ -440,6 +442,214 @@ l3_hyplv:     .long 0x0C1FA490   ! in-hyper meter / hyper level up
 l3_cancel:    .long CANCEL
 l3_tblA:      .long 0x0C338848   ! kill gauge by deaths
 l3_tblB:      .long 0x0C33881C   ! kill gauge by hyper stock
+
+
+! ================================================================ shot vs bullet (1.5+ hyper)
+! Each player-shot update routine (4 per ship) is redirected to a stub that runs the
+! original update, then - in 1.5+ during hyper - cancels enemy bullets touching the shot.
+! The laser uses other routines, so it does not cancel bullets.
+        .global shot_stub0
+        .align 2
+shot_stub0:
+        mov.l   1f,r1
+        bra     shot_common
+        nop
+        .align 2
+1:      .long   0x0C2173D0
+        .global shot_stub1
+        .align 2
+shot_stub1:
+        mov.l   1f,r1
+        bra     shot_common
+        nop
+        .align 2
+1:      .long   0x0C217680
+        .global shot_stub2
+        .align 2
+shot_stub2:
+        mov.l   1f,r1
+        bra     shot_common
+        nop
+        .align 2
+1:      .long   0x0C217A80
+        .global shot_stub3
+        .align 2
+shot_stub3:
+        mov.l   1f,r1
+        bra     shot_common
+        nop
+        .align 2
+1:      .long   0x0C217DD0
+        .global shot_stub4
+        .align 2
+shot_stub4:
+        mov.l   1f,r1
+        bra     shot_common
+        nop
+        .align 2
+1:      .long   0x0C218160
+        .global shot_stub5
+        .align 2
+shot_stub5:
+        mov.l   1f,r1
+        bra     shot_common
+        nop
+        .align 2
+1:      .long   0x0C2183C0
+        .global shot_stub6
+        .align 2
+shot_stub6:
+        mov.l   1f,r1
+        bra     shot_common
+        nop
+        .align 2
+1:      .long   0x0C218770
+        .global shot_stub7
+        .align 2
+shot_stub7:
+        mov.l   1f,r1
+        bra     shot_common
+        nop
+        .align 2
+1:      .long   0x0C2189F0
+        .global shot_stub8
+        .align 2
+shot_stub8:
+        mov.l   1f,r1
+        bra     shot_common
+        nop
+        .align 2
+1:      .long   0x0C218D80
+        .global shot_stub9
+        .align 2
+shot_stub9:
+        mov.l   1f,r1
+        bra     shot_common
+        nop
+        .align 2
+1:      .long   0x0C218FE0
+        .global shot_stub10
+        .align 2
+shot_stub10:
+        mov.l   1f,r1
+        bra     shot_common
+        nop
+        .align 2
+1:      .long   0x0C2193E0
+        .global shot_stub11
+        .align 2
+shot_stub11:
+        mov.l   1f,r1
+        bra     shot_common
+        nop
+        .align 2
+1:      .long   0x0C2196B0
+
+        .align 2
+shot_common:
+        sts.l   pr,@-r15
+        mov.l   r8,@-r15
+        mov.l   r9,@-r15
+        mov.l   r10,@-r15
+        mov.l   r11,@-r15
+        mov.l   r12,@-r15
+        mov.l   r13,@-r15
+        mov     r4,r8
+        jsr     @r1                 ! original shot update
+        nop
+        mov     r0,r13
+        tst     r0,r0
+        bt      sc_done             ! shot removed this frame
+        mov.l   s_vars,r1
+        mov.l   @r1,r0
+        cmp/eq  #1,r0
+        bf      sc_done             ! not 1.5+
+        mov.l   s_player,r2
+        mov.w   s_2e0,r0
+        mov.l   @(r0,r2),r0
+        tst     r0,r0
+        bt      sc_done             ! not in hyper
+        mov     r8,r2
+        add     #0x48,r2
+        mov.l   @r2+,r3             ! shot x
+        mov.l   r3,@(24,r1)
+        mov.l   @r2,r3              ! shot y
+        mov.l   r3,@(28,r1)
+        mov.l   s_bmgr,r9
+        mov.l   @r9,r9
+        tst     r9,r9
+        bt      sc_done
+        mov.l   s_mgroff,r0
+        add     r0,r9               ! bullet manager
+        mov.l   @(28,r9),r0
+        tst     r0,r0
+        bt      sc_done
+        mov.l   @(20,r9),r10        ! first bullet
+sc_loop:
+        tst     r10,r10
+        bt      sc_done
+        mov.l   @r10,r0
+        cmp/eq  #2,r0
+        bf      sc_next
+        mov.l   s_vars,r1
+        mov     r10,r2
+        add     #0x2C,r2
+        mov.l   @r2+,r3             ! bullet x
+        mov.l   @(24,r1),r0
+        sub     r0,r3
+        cmp/pz  r3
+        bt      sc_ax
+        neg     r3,r3
+sc_ax:  mov.l   s_rad,r0
+        cmp/gt  r0,r3
+        bt      sc_next
+        mov.l   @r2,r3              ! bullet y
+        mov.l   @(28,r1),r0
+        sub     r0,r3
+        cmp/pz  r3
+        bt      sc_ay
+        neg     r3,r3
+sc_ay:  mov.l   s_rad,r0
+        cmp/gt  r0,r3
+        bt      sc_next
+        ! cancel just this bullet: make it the only list entry for the game's cancel routine
+        mov.l   @(4,r10),r11        ! next
+        mov.l   @(20,r9),r12        ! list head
+        mov.l   r10,@(20,r9)
+        mov     #0,r0
+        mov.l   r0,@(4,r10)
+        mov     #1,r4               ! big stars
+        mov.l   s_player,r5
+        mov.l   s_cancel1,r0
+        jsr     @r0
+        nop
+        mov.l   r11,@(4,r10)
+        mov.l   r12,@(20,r9)
+        bra     sc_loop
+        mov     r11,r10
+sc_next:
+        bra     sc_loop
+        mov.l   @(4,r10),r10
+sc_done:
+        mov     r13,r0
+        mov.l   @r15+,r13
+        mov.l   @r15+,r12
+        mov.l   @r15+,r11
+        mov.l   @r15+,r10
+        mov.l   @r15+,r9
+        mov.l   @r15+,r8
+        lds.l   @r15+,pr
+        rts
+        nop
+        .align 1
+s_2e0:  .word 0x2E0
+        .align 2
+s_vars:    .long v_mode
+s_player:  .long 0x0C5F9970
+s_bmgr:    .long 0x0C4C8978
+s_mgroff:  .long 0x00030DFC
+s_rad:     .long 0x000A0000     ! 10 px
+s_cancel1: .long 0x0C1FE220     ! cancel bullets in the manager list (flag, player)
 
 ! ================================================================ menu text
         .align 2

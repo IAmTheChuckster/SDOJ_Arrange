@@ -36,6 +36,7 @@ Use **Up / Down** to move the arrow and press **START** to play the selected mod
 - **Hyper meter** fills **3 times as fast** as Arcade (death bonus unchanged), and **keeps filling during hyper**: filling it during a hyper raises the HUD **HYPER Lv** (as in Arcade, just faster).
 - **GP bonus during hyper** by hyper level (hypers spent to start it + HYPER Lv gained during it): Lv1 x2.0, Lv2 x2.2, Lv3 x2.4, Lv4 x2.6, Lv5 x2.8, Lv6-10 x3.0 (Arcade: x1.1-x1.5, then x2.2-x3.0, from hypers spent only).
 - **Hidden bees**: every hidden bee cancels all bullets into big stars and adds **+1 hyper** (max 10).
+- **Shot cancels bullets during hyper**: while a hyper is active, enemy bullets touched by your shot (not the laser) are cancelled into big stars.
 
 ## Patching the game
 You need your own `ddpsdoj.zip` (MAME set, u4 CRC `e2a4411c`). The patched u4 has CRC `c3bea559`.
