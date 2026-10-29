@@ -60,6 +60,15 @@ th_menu:
         mov.l   r0,@(8,r1)          ! menu = 1
         mov.w   w_grace,r0
         mov.l   r0,@(20,r1)         ! grace = 240 frames
+        ! show the title text (menu) right away: text-enable flag +0xC30 = 1,
+        ! slide-in offset +0xC34 = 0
+        mov.w   w_c30,r0
+        mov     r4,r2
+        add     r0,r2
+        mov     #1,r0
+        mov.l   r0,@r2
+        mov     #0,r0
+        mov.l   r0,@(4,r2)
         mov.l   l_p1in,r2
         mov.l   @r2,r3              ! held
         mov.l   @(16,r1),r5         ! prev held
@@ -165,6 +174,7 @@ dn_go:
         .align 1
 w_ylim: .word 0xCC
 w_grace: .word 240
+w_c30:  .word 0xC30
 w_yb6:  .word 0xB6
 w_yba:  .word 0xBA
         .align 2
@@ -292,7 +302,7 @@ l2_orig_acthyp:  .long ORIG_ACTHYP
 l2_orig_gp:      .long ORIG_GP
 
 ! ================================================================ gauge event hook
-! p r4, amount r5, type r6.  1.5+: gauge fills 3x; during hyper the stored gauge keeps filling.
+! p r4, amount r5, type r6.  1.5+: gauge fills 3x; during hyper the meter keeps filling and raises the hyper level.
         .global kill_hook
 kill_hook:
         mov.l   l3_vars0,r1
@@ -358,23 +368,12 @@ kh_mul3:
         add     r3,r3
         add     r3,r2               ! amount*3
 kh_add:
-        mov.w   w3_2f8,r0
-        mov.l   @(r0,r8),r3         ! stored gauge
-        add     r2,r3
-        mov.w   w3_1ff,r2
-        cmp/gt  r2,r3
-        bf      kh_store
-        mov.w   w3_200,r2
-        sub     r2,r3
-        mov.l   r3,@(r0,r8)
+        ! feed the game's own in-hyper meter (0x0C1FA490): when it fills,
+        ! the hyper level goes up (HUD "HYPER Lv") exactly as in Arcade
         mov     r8,r4
-        mov.l   l3_spawn,r0
-        jsr     @r0                 ! drop a hyper item
-        mov     #1,r5
-        bra     kh_done
-        nop
-kh_store:
-        mov.l   r3,@(r0,r8)
+        mov.l   l3_hyplv,r0
+        jsr     @r0
+        mov     r2,r5
 kh_done:
         mov     r11,r0
         mov.l   @r15+,r11
@@ -434,7 +433,7 @@ w3_200: .word 0x200
 l3_vars0:     .long v_mode
 l3_orig_kill: .long ORIG_KILL
 l3_orig_bee:  .long ORIG_BEE
-l3_spawn:     .long SPAWN_HYPER
+l3_hyplv:     .long 0x0C1FA490   ! in-hyper meter / hyper level up
 l3_cancel:    .long CANCEL
 l3_tblA:      .long 0x0C338848   ! kill gauge by deaths
 l3_tblB:      .long 0x0C33881C   ! kill gauge by hyper stock
