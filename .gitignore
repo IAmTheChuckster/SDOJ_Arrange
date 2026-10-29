@@ -1,0 +1,8 @@
+*.zip
+*.sta
+/patched/
+__pycache__/
+u4
+u2
+u23
+u24

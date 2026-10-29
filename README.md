@@ -13,7 +13,40 @@ I did all the testing and planning.
 
 ## What it changes
 
+### Mode select (title screen)
+After inserting a coin, the rank and 1st/2nd extend lines on the title are replaced by a mode menu:
+
+```
+> ARCADE
+  1.5+
+  SDOJ RESURRECTION
+```
+
+Use **Up / Down** to move the arrow and press **START** to play the selected mode. With no credits the title is unchanged, and attract demos always run in Arcade.
+
+| Mode | Status |
+|---|---|
+| ARCADE | Unchanged original game |
+| 1.5+ | Playable (see below) |
+| SDOJ RESURRECTION | Placeholder - currently plays like Arcade |
+
+### 1.5+ mode
+- **Buttons**: buttons 1-3 work as in Arcade (button 2 = bomb, or hyper when a hyper is ready). **Button 4 = bomb only**, so with a hyper ready you can bomb with button 4 and press button 2 during the bomb to go into hyper.
+- **Bombs**: maximum bombs raised to **6** for every dress type (shot, laser, expert); you start with 6.
+- **Hyper meter** fills **3 times as fast** as Arcade (death bonus unchanged), and **keeps filling during hyper** (the meter is shown again when the hyper ends; a full meter drops a hyper item).
+- **GP bonus during hyper** by hyper level: Lv1 x2.0, Lv2 x2.2, Lv3 x2.4, Lv4 x2.6, Lv5 x2.8, Lv6-10 x3.0 (Arcade: x1.1-x1.5, then x2.2-x3.0).
+- **Hidden bees**: every hidden bee cancels all bullets into big stars and adds **+1 hyper** (max 10).
+
 ## Patching the game
+You need your own `ddpsdoj.zip` (MAME set, u4 CRC `E2A4411C`). Python 3, no extra packages:
+
+```
+python3 patcher/sdoj_patch.py ddpsdoj.zip patched/ddpsdoj.zip
+```
+
+Only `u4` changes; all other files are copied as they are. Use the output as `ddpsdoj.zip` in your MAME 0.289 roms folder (MAME will warn about the changed u4 checksum - that is expected).
+
+Developers: `src/patch.s` is the SH-3 source; `python3 tools/build.py` (needs SH binutils such as `binutils-sh4-linux-gnu`) regenerates `patcher/sdoj_patch_data.py`. The patch adds a small boot loader in unused u4 space that copies the new code to free work RAM (0x0CE00000) and redirects a few code pointers in the unpacked program. Research notes are in `docs/ddpsdoj-notes.md`.
 
 ## Testing
 This patch was tested with MAME 0.289 and [CV1k core for the MiSTer FPGA by Raki](https://www.patreon.com/c/ikamusume/posts)<br>
