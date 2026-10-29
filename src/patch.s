@@ -122,11 +122,9 @@ ds_ext:
         mov     #1,r3
         mov.w   w_ylim,r0
         cmp/ge  r0,r5               ! y >= 0xCC -> second extend line
-        bt      ds_l2
-        bra     ds_pick
-        add     #-4,r5              ! move the middle line up 4 px (even spacing)
-ds_l2:
+        bf      ds_pick
         mov     #2,r3
+        add     #8,r5               ! move the last line down 8 px (16 px spacing)
 ds_pick:
         ! index = line*2 + (sel==line ? 0 : 1)
         mov     r3,r0
