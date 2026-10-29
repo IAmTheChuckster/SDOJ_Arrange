@@ -44,13 +44,21 @@ def main():
     mra = re.sub(r'(<part name="sdojdfk_u4" crc=")[0-9a-fA-F]{8}', lambda m: m.group(1) + '%08x' % pcrc, mra)
     open(mra_path, 'w').write(mra)
 
-    html = open(os.path.join(ROOT, 'patcher', 'web_template.html')).read()
-    html = (html.replace('__ORIG_CRC__', '0x%08x' % ORIG_CRC)
-                .replace('__PATCHED_CRC__', '0x%08x' % pcrc)
-                .replace('__PATCHED_HEX__', '%08x' % pcrc)
-                .replace('__BUILD__', build)
-                .replace('__PATCH__', json.dumps(patch))
-                .replace('__MRA__', json.dumps(mra)))
+    # update the published page in place (no separate template)
+    ip = os.path.join(ROOT, 'patcher', 'index.html')
+    html = open(ip).read()
+    old_crc = re.search(r'PATCHED_CRC = 0x([0-9a-f]{8})', html).group(1)
+    def sub(pat, rep, h):
+        h2, n = re.subn(pat, rep, h, count=1, flags=re.S)
+        if n != 1:
+            sys.exit('index.html: pattern not found: ' + pat)
+        return h2
+    html = sub(r'const ORIG_CRC = 0x[0-9a-f]+, PATCHED_CRC = 0x[0-9a-f]+',
+               'const ORIG_CRC = 0x%08x, PATCHED_CRC = 0x%08x' % (ORIG_CRC, pcrc), html)
+    html = sub(r'const PATCH = \[.*?\];\n', lambda m: 'const PATCH = ' + json.dumps(patch) + ';\n', html)
+    html = sub(r'const MRA = ".*?";\n', lambda m: 'const MRA = ' + json.dumps(mra) + ';\n', html)
+    html = html.replace('<td class="mono">%s</td>' % old_crc, '<td class="mono">%08x</td>' % pcrc)
+    html = re.sub(r'build \d+', 'build ' + build, html)
     open(os.path.join(ROOT, 'patcher', 'index.html'), 'w').write(html)
 
     p = os.path.join(ROOT, 'patcher', 'sdoj_patch.py')

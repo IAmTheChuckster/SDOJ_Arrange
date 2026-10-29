@@ -49,7 +49,7 @@
     <nvram index="3" size="135680"/>
 
     <rom index="0" zip="ddpsdojdfk.zip" md5="none">
-        <part name="sdojdfk_u4" crc="7eed427e" length="0x400000"/>
+        <part name="sdojdfk_u4" crc="dbb46730" length="0x400000"/>
     </rom>
 
     <buttons names="Laser,Bomb/Hyper,Rapid Shot,Bomb,Start,Coin,Test,Service,Save State" default="A,B,X,Y,Start,R,L,Select"/>

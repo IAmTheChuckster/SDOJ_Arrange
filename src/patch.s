@@ -16,6 +16,9 @@ v_prevheld: .long 0     ! P1 held bits last title frame (edge detect)
 v_grace:    .long 0     ! title frames without credit before the mode falls back to Arcade
 v_sx:       .long 0     ! current shot x (16.16)
 v_sy:       .long 0     ! current shot y (16.16)
+v_inbee:    .long 0     ! 1 while the bee pickup routine runs (1.5+)
+v_beeobj:   .long 0     ! bee pickup object (its +0xD8 is the % shown)
+v_popup:    .long 0     ! 1 if the bee % popup was shown
 
         .org 0x100
 ! ---------------------------------------------------------------- game addresses
@@ -85,13 +88,13 @@ th_menu:
         add     #-1,r0
         cmp/pz  r0
         bt      th_noup
-        mov     #2,r0
+        mov     #1,r0
 th_noup:
         mov     #2,r6
         tst     r6,r5
         bt      th_nodn
         add     #1,r0
-        mov     #2,r6
+        mov     #1,r6
         cmp/gt  r6,r0
         bf      th_nodn
         mov     #0,r0
@@ -307,17 +310,24 @@ l2_orig_acthyp:  .long ORIG_ACTHYP
 l2_orig_gp:      .long ORIG_GP
 
 ! ================================================================ gauge event hook
-! p r4, amount r5, type r6.  1.5+: gauge fills 3x; during hyper the meter keeps filling and raises the hyper level.
+! p r4, amount r5, type r6.  1.5+: gauge fills 3x outside hyper; during hyper as Arcade.
+! During a bee pickup in 1.5+ the bee's own combo-based gauge gain is skipped.
         .global kill_hook
 kill_hook:
         mov.l   l3_vars0,r1
         mov.l   @(0,r1),r0
         cmp/eq  #1,r0
         bf      kh_orig
+        mov.l   @(32,r1),r0         ! inside bee pickup?
+        tst     r0,r0
+        bt      kh_nobee
+        rts
+        mov     #0,r0
+kh_nobee:
         mov.w   w3_2e0,r0
         mov.l   @(r0,r4),r0         ! hyper active?
         tst     r0,r0
-        bf      kh_hyper
+        bf      kh_orig             ! in hyper: Arcade rate
         mov     r5,r0               ! not in hyper: amount * 3
         add     r5,r5
         add     r0,r5
@@ -325,88 +335,52 @@ kh_orig:
         mov.l   l3_orig_kill,r0
         jmp     @r0
         nop
-kh_hyper:
-        sts.l   pr,@-r15
-        mov.l   r8,@-r15
-        mov.l   r9,@-r15
-        mov.l   r10,@-r15
-        mov.l   r11,@-r15
-        mov     r4,r8
-        mov     r5,r9
-        mov     r6,r10
-        mov.l   l3_orig_kill,r0
-        jsr     @r0
-        nop
-        mov     r0,r11              ! keep return value
-        ! add = amount for type 3 (counted on every hit), amount*3 otherwise.
-        ! Type 0 (kills) during hyper passes a smaller amount, so use the
-        ! normal kill amount A[deaths] + B[stock] like outside hyper.
-        mov     r9,r2
-        mov     r10,r0
-        cmp/eq  #3,r0
-        bt      kh_add
-        tst     r0,r0
-        bf      kh_mul3
-        mov.w   w3_3bc,r0
-        mov.l   @(r0,r8),r0         ! deaths index
-        mov     #4,r3
-        cmp/hi  r3,r0
-        bf      kh_a
-        mov     #4,r0
-kh_a:   shll2   r0
-        mov.l   l3_tblA,r3
-        mov.l   @(r0,r3),r2
-        mov.w   w3_2e4,r0
-        mov.l   @(r0,r8),r0         ! stock
-        mov     #10,r3
-        cmp/hi  r3,r0
-        bf      kh_b
-        mov     #10,r0
-kh_b:   shll2   r0
-        mov.l   l3_tblB,r3
-        mov.l   @(r0,r3),r3
-        add     r3,r2
-        mov     r2,r9
-kh_mul3:
-        mov     r9,r2
-        mov     r9,r3
-        add     r3,r3
-        add     r3,r2               ! amount*3
-kh_add:
-        ! feed the game's own in-hyper meter (0x0C1FA490): when it fills,
-        ! the hyper level goes up (HUD "HYPER Lv") exactly as in Arcade
-        mov     r8,r4
-        mov.l   l3_hyplv,r0
-        jsr     @r0
-        mov     r2,r5
-kh_done:
-        mov     r11,r0
-        mov.l   @r15+,r11
-        mov.l   @r15+,r10
-        mov.l   @r15+,r9
-        mov.l   @r15+,r8
-        lds.l   @r15+,pr
-        rts
-        nop
 
 ! ================================================================ hidden bee hook
-! 1.5+: every bee cancels bullets into big stars and adds one hyper stock.
+! 1.5+: every bee shows 100%, gives exactly one hyper stock (no combo-based gauge)
+! and cancels bullets into big stars.
         .global bee_hook
 bee_hook:
         sts.l   pr,@-r15
         mov.l   r8,@-r15
+        mov.l   r9,@-r15
         mov.l   @(8,r4),r8          ! player
+        mov.l   l3_vars0,r1
+        mov.l   @(0,r1),r0
+        cmp/eq  #1,r0
+        bf      bee_arc
+        mov     #1,r0
+        mov.l   r0,@(32,r1)         ! inbee = 1
+        mov.l   r6,@(36,r1)         ! bee object
+        mov     #0,r0
+        mov.l   r0,@(40,r1)         ! popup = 0
+bee_arc:
         mov.l   l3_orig_bee,r0
         jsr     @r0
         nop
-        mov.l   r0,@-r15
+        mov     r0,r9
         mov.l   l3_vars0,r1
         mov.l   @(0,r1),r2
         mov     #1,r3
         cmp/eq  r3,r2
         bf      bee_ret
+        mov     #0,r0
+        mov.l   r0,@(32,r1)         ! inbee = 0
         tst     r8,r8
         bt      bee_ret
+        ! show "100%" if the game skipped the popup (combo too low)
+        mov.l   @(40,r1),r0
+        tst     r0,r0
+        bf      bee_stock
+        mov.l   @(36,r1),r2
+        mov.w   w3_d8,r0
+        mov     #100,r3
+        mov.l   r3,@(r0,r2)
+        mov     r8,r4
+        mov.l   l3_popup,r0
+        jsr     @r0
+        mov     #1,r5
+bee_stock:
         mov.w   w3_2e4,r0
         mov.l   @(r0,r8),r2         ! hyper stock
         mov     #10,r3
@@ -421,14 +395,35 @@ bee_cancel:
         jsr     @r0
         mov     #1,r6
 bee_ret:
-        mov.l   @r15+,r0
+        mov     r9,r0
+        mov.l   @r15+,r9
         mov.l   @r15+,r8
         lds.l   @r15+,pr
         rts
         nop
 
+! bee "%" popup (0x0C2778E0), reached only from the bee pickup routine:
+! in 1.5+ the shown value is always 100.
+        .global popup_hook
+popup_hook:
+        mov.l   l3_vars0,r1
+        mov.l   @(32,r1),r0
+        tst     r0,r0
+        bt      pp_go
+        mov     #1,r0
+        mov.l   r0,@(40,r1)         ! popup shown
+        mov.l   @(36,r1),r2
+        mov.w   w3_d8,r0
+        mov     #100,r3
+        mov.l   r3,@(r0,r2)
+pp_go:
+        mov.l   l3_popup,r0
+        jmp     @r0
+        nop
+
         .align 1
 w3_2e0: .word 0x2E0
+w3_d8:  .word 0xD8
 w3_3bc: .word 0x3BC
 w3_2e4: .word 0x2E4
 w3_2f8: .word 0x2F8
@@ -440,6 +435,7 @@ l3_orig_kill: .long ORIG_KILL
 l3_orig_bee:  .long ORIG_BEE
 l3_hyplv:     .long 0x0C1FA490   ! in-hyper meter / hyper level up
 l3_cancel:    .long CANCEL
+l3_popup:     .long 0x0C2778E0   ! bee % popup
 l3_tblA:      .long 0x0C338848   ! kill gauge by deaths
 l3_tblB:      .long 0x0C33881C   ! kill gauge by hyper stock
 
@@ -653,12 +649,11 @@ s_cancel1: .long 0x0C1FE220     ! cancel bullets in the manager list (flag, play
 
 ! ================================================================ menu text
         .align 2
-strtab:    .long s_arc_on, s_arc_off, s_15_on, s_15_off, s_res_on, s_res_off
+strtab:    .long s_arc_on, s_arc_off, s_15_on, s_15_off, s_blank, s_blank
 s_arc_on:  .asciz "> ARCADE"
 s_arc_off: .asciz "  ARCADE"
 s_15_on:   .asciz "> 1.5+"
 s_15_off:  .asciz "  1.5+"
-s_res_on:  .asciz "> SDOJ RESURRECTION"
-s_res_off: .asciz "  SDOJ RESURRECTION"
+s_blank:   .asciz " "
         .align 2
 _end:
