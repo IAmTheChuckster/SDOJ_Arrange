@@ -877,6 +877,9 @@ hyplv_frame:
         mov.l   x_hudcode,r1        ! HUD rank: 3 digits, no cap at 99
         mov.l   x_hud3,r0
         mov.l   r0,@r1
+        add     #-12,r1             ! and moved half a digit right (centred under RANK)
+        mov.l   x_hudx3,r0
+        mov.l   r0,@r1
         mov.w   x_2e8,r0
         mov.l   @(r0,r8),r2         ! HYPER Lv now
         mov.l   x_vars,r1
@@ -906,6 +909,9 @@ hx_ret: mov.l   @r15+,r8
 hud_arcade:
         mov.l   x_hudcode,r1
         mov.l   x_hud2,r0
+        mov.l   r0,@r1
+        add     #-12,r1
+        mov.l   x_hudx2,r0
         rts
         mov.l   r0,@r1
 
@@ -1002,6 +1008,8 @@ x_vars:    .long v_mode
 x_hudcode: .long 0x0C27ECD4
 x_hud3:    .long 0x0009E703     ! nop / mov #3,r7
 x_hud2:    .long 0xEA63E702     ! mov #99,r10 / mov #2,r7 (original)
+x_hudx3:   .long 0x55E10009     ! x offset: full digit instead of half (0x0C27ECC8)
+x_hudx2:   .long 0x55E14621     ! original
 x_se:      .long 0x0C282860
 x_voice:   .long 0x0C276900
 x_getrank: .long 0x0C1F9F80
