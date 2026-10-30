@@ -29,12 +29,11 @@ The boot screen shows **SDOJ RESURRECTED 2026.10.30**, and the warning screen sh
 You need your own `ddpsdoj.zip` (MAME set, u4 CRC `e2a4411c`). The patched u4 has CRC `0a3ba4a8`.
 
 The patched set is `ddpsdojdfk.zip`, with the patched u4 stored as `sdojdfk_u4`.
+### Web patcher
 
-**Browser:** open `patcher/index.html` (or the GitHub Pages copy), drop `ddpsdoj.zip` on it and download `ddpsdojdfk.zip`, the MiSTer `SDOJ Resurrected.mra`, or `sdojdfk_u4` alone. Everything runs locally in the browser.
+open `patcher/index.html` (or the GitHub Pages copy), drop `ddpsdoj.zip` on it and download `ddpsdojdfk.zip`, the MiSTer `SDOJ Resurrected.mra`, or `sdojdfk_u4` alone. Everything runs locally in the browser.
 
-**MiSTer:** put `ddpsdojdfk.zip` in your games folder and `patcher/SDOJ Resurrected.mra` in `_Arcade`.
-
-**Python 3** (no extra packages):
+### Python patcher
 
 ```
 python3 patcher/sdoj_patch.py ddpsdoj.zip patched/ddpsdojdfk.zip
