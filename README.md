@@ -1,11 +1,5 @@
 # SDOJ Resurrected
 
-## To do
-1. Create 1.5+ Mode based on 360 1.5
-2. Create DFK-like arrange mode using 1.5+ mode as a base.
-3. **Arrange**: expand to 6 bombs
-
-   
 ## About this project
 Why did I make this? Because it's fun and for my own personal research to see the capabilities of Claude.<br> 
 While Claude was used I put effort in making sure there are balanced gameplay.<br> 
