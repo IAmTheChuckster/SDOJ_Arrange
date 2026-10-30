@@ -91,6 +91,16 @@ Variables at 0x0CE00000: mode (0 Arcade, 1 1.5+, 2 Resurrection), menu cursor, m
 - Hyper GP/HYPER Lv: +0x2E8 is the HUD HYPER Lv (level-ups during hyper via 0x0C1FA490); GP in 1.5+ uses +0x2EC + +0x2E8.
 - Chain x GP is computed in 32 bits (0x0C1F6ECC, 0x0C1F706E): it overflows above 2^31 / percent (original game; left as is).
 
+## Rank
+- Player rank +0x2F0 (HUD RANK, 0..50): +table 0x0C3387F0[hypers spent] per hyper (0,1,1,2,2,3,3,4,4,5,5), -2 per bomb (0x0C1F9FD0).
+- 0x0C661B48 = max player rank (via 0x0C1F9F80, literal 0x0C1FDD94); HUD draws it (0x0C27EC80, literal 0x0C27EDF0, 2 digits, cap 99).
+- Difficulty D 0x0C4C897C = table 0x0C4C8768[rank] (0..30; +1 per rank to 10, then +1 per 2), x0.75 when nobody is in hyper,
+  floor by table 0x0C4C8900, cap 50. D is added to every enemy bullet's speed at spawn (0x0C1FE5CC).
+- 1.5+: rank to 999, table index kept at 50, bullet speed x(1 + (rank-50)/1000) via the speed-part call literal 0x0C1FE734.
+
+## Sound
+- Hyper stock increase (HUD task 0x0C213C74): 0x0C282860 (SE) + 0x0C276900(9,70) = "HYPER SYSTEM READY" voice.
+
 ## Open questions
 - Exact meaning of the type 0 "hit milestone" counter (every 21 hits) vs. kill events.
 - Bee chain completion rules (+0x384 > 7).

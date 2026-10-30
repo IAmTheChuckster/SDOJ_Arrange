@@ -23,6 +23,8 @@ v_hcnt:     .long 0     ! laser-hit counter during hyper (every 3rd hit counts)
 v_lastdeaths: .long 0   ! player deaths seen last frame (1.5+ bombs)
 v_lastbombs: .long 0    ! player bombs seen last frame
 v_gpfix:    .long 0     ! GP bonus fixed at hyper start (0 = not set)
+v_hudrank:  .long 0     ! real (uncapped) rank, shown on the HUD
+v_lastlv:   .long 0     ! HYPER Lv seen last frame (voice)
 
         .org 0x100
 ! ---------------------------------------------------------------- game addresses
@@ -106,6 +108,9 @@ th_nodn:
         mov.l   r0,@(4,r1)          ! sel
         mov.l   r0,@(0,r1)          ! mode = sel
 th_call:
+        mov.l   l_hudarc,r0
+        jsr     @r0
+        nop
         mov.l   @r15+,r4
         mov.l   l_orig_title,r0
         jmp     @r0                 ! tail call, pr restored below first
@@ -191,6 +196,7 @@ l_vars0:      .long v_mode
 l_credits:    .long CREDITS
 l_p1in:       .long P1IN
 l_orig_title: .long ORIG_TITLE
+l_hudarc:     .long hud_arcade
 l_rank_lo:    .long 0x0C30D590
 l_rank_hi:    .long 0x0C30D5D8
 l_ext_lo:     .long 0x0C315F00
@@ -216,6 +222,19 @@ trybomb_hook:
         mov.l   @r2,r2              ! player
         tst     r2,r2
         bt      tb_btn
+        ! --- 1.5+: "HYPER SYSTEM READY" voice when HYPER Lv goes up
+        mov.l   r2,@-r15
+        mov.l   r4,@-r15
+        mov.l   r6,@-r15
+        sts.l   pr,@-r15
+        mov.l   l2_hyplvframe,r0
+        jsr     @r0
+        mov     r2,r4
+        lds.l   @r15+,pr
+        mov.l   @r15+,r6
+        mov.l   @r15+,r4
+        mov.l   @r15+,r2
+        mov.l   l2_vars0,r1
         ! --- 1.5+: always play as Expert (+0x10 = 2); the dress look (+0x14 ...) is kept
         mov     #2,r0
         mov.l   r0,@(16,r2)
@@ -274,8 +293,49 @@ acthyp_hook:
         rts
         mov     #0,r0
 ah_go:
+        mov.l   @(0,r1),r0
+        cmp/eq  #1,r0
+        bt      ah_15
         mov.l   l2_orig_acthyp,r0
         jmp     @r0
+        nop
+ah_15:                              ! 1.5+: rank goes past 50 (max 999)
+        sts.l   pr,@-r15
+        mov.l   r8,@-r15
+        mov.l   r9,@-r15
+        mov.l   r10,@-r15
+        mov     r4,r8
+        mov.w   w_2e4b,r0
+        mov.l   @(r0,r8),r9         ! stocks before
+        mov.w   w_2f0,r0
+        mov.l   @(r0,r8),r10        ! rank before
+        mov.l   l2_orig_acthyp,r0
+        jsr     @r0
+        nop
+        tst     r0,r0
+        bt      ah_ret
+        mov     r0,r1
+        mov     #11,r2
+        cmp/hi  r2,r9
+        bf      ah_idx
+        mov     #11,r9
+ah_idx: shll2   r9
+        mov.l   l2_rankadd,r2
+        add     r9,r2
+        mov.l   @r2,r2
+        add     r2,r10
+        mov.w   w_999,r2
+        cmp/gt  r2,r10
+        bf      ah_set
+        mov     r2,r10
+ah_set: mov.w   w_2f0,r0
+        mov.l   r10,@(r0,r8)
+        mov     r1,r0
+ah_ret: mov.l   @r15+,r10
+        mov.l   @r15+,r9
+        mov.l   @r15+,r8
+        lds.l   @r15+,pr
+        rts
         nop
 
 ! ================================================================ GP bonus hook
@@ -337,6 +397,9 @@ gp_ret:
 
         .align 1
 w_2ec:  .word 0x2EC
+w_2e4b: .word 0x2E4
+w_2f0:  .word 0x2F0
+w_999:  .word 999
 w_3bb:  .word 0x3BB
 w_180:  .word 180
 w_300:  .word 300
@@ -345,6 +408,8 @@ l2_vars0:        .long v_mode
 l2_orig_trybomb: .long ORIG_TRYBOMB
 l2_orig_acthyp:  .long ORIG_ACTHYP
 l2_orig_gp:      .long ORIG_GP
+l2_rankadd:      .long 0x0C3387F0   ! rank added per hyper level
+l2_hyplvframe:   .long hyplv_frame
 
 ! ================================================================ gauge event hook
 ! p r4, amount r5, type r6.  1.5+: gauge fills 3x outside hyper; during hyper it keeps
@@ -800,6 +865,185 @@ bi_ret: mov     r9,r0
 bi_vars:   .long v_mode
 bi_orig:   .long 0x0C1F7D50
 bi_cancel: .long CANCEL
+
+! ================================================================ 1.5+ per-frame extras
+! r4 = player. Plays the hyper-ready voice when HYPER Lv (+0x2E8) goes up and
+! switches the HUD rank to 3 digits.
+        .global hyplv_frame
+hyplv_frame:
+        sts.l   pr,@-r15
+        mov.l   r8,@-r15
+        mov     r4,r8
+        mov.l   x_hudcode,r1        ! HUD rank: 3 digits, no cap at 99
+        mov.l   x_hud3,r0
+        mov.l   r0,@r1
+        mov.w   x_2e8,r0
+        mov.l   @(r0,r8),r2         ! HYPER Lv now
+        mov.l   x_vars,r1
+        add     #64,r1
+        mov.l   @r1,r3              ! last frame
+        mov.l   r2,@r1
+        cmp/gt  r3,r2
+        bf      hx_ret
+        mov.w   x_2e0,r0
+        mov.l   @(r0,r8),r0         ! only during a hyper
+        tst     r0,r0
+        bt      hx_ret
+        mov.l   x_se,r0             ! sound effect
+        jsr     @r0
+        nop
+        mov     #9,r4               ! "HYPER SYSTEM READY" voice
+        mov.l   x_voice,r0
+        jsr     @r0
+        mov     #70,r5
+hx_ret: mov.l   @r15+,r8
+        lds.l   @r15+,pr
+        rts
+        nop
+
+! Arcade: HUD rank back to the original 2 digits (called from the title hook).
+        .global hud_arcade
+hud_arcade:
+        mov.l   x_hudcode,r1
+        mov.l   x_hud2,r0
+        rts
+        mov.l   r0,@r1
+
+! rank index for the difficulty table stays 0..50; the HUD shows the real rank.
+        .global getrank_hook
+getrank_hook:
+        sts.l   pr,@-r15
+        mov.l   x_getrank,r0
+        jsr     @r0
+        nop
+        mov.l   x_vars,r1
+        mov.l   r0,@(60,r1)         ! HUD rank
+        mov     #50,r2
+        cmp/gt  r2,r0
+        bf      gr_ret
+        mov     r2,r0
+gr_ret: lds.l   @r15+,pr
+        rts
+        nop
+
+! bullet speed: above rank 50, +0.1% per rank (1.5+). Hooks the speed-part call in
+! the bullet spawn; the caller's r9 holds base speed + rank bonus at this point.
+        .global speed_hook
+speed_hook:
+        sts.l   pr,@-r15
+        mov.l   x_speedfn,r0
+        jsr     @r0
+        nop
+        mov.l   x_vars,r1
+        mov.l   @r1,r2
+        mov     #1,r3
+        cmp/eq  r3,r2
+        bf      sp_ret
+        mov.l   @(60,r1),r2         ! rank
+        mov     #50,r3
+        sub     r3,r2
+        cmp/pl  r2
+        bf      sp_ret
+        mov     r9,r3
+        add     r0,r3
+        add     #48,r3              ! speed the game is about to use
+        mul.l   r2,r3
+        sts     macl,r3
+        mov.w   x_1000,r2
+        mov.l   r0,@-r15
+        mov     r3,r0
+        mov     r2,r1
+        mov.l   x_div,r3            ! r0 / r1
+        jsr     @r3
+        nop
+        mov     r0,r3
+        mov.l   @r15+,r0
+        add     r3,r0
+sp_ret: lds.l   @r15+,pr
+        rts
+        nop
+
+! unsigned r0 / r1 -> r0 (simple, small values)
+udiv:   mov     #0,r2
+ud_l:   cmp/hs  r1,r0
+        bf      ud_e
+        sub     r1,r0
+        bra     ud_l
+        add     #1,r2
+ud_e:   rts
+        mov     r2,r0
+
+! boot text (runs from the loader before the game starts)
+        .global boot_init
+boot_init:
+        mova    bt_tab,r0
+        mov     r0,r4
+bt_l:   mov.l   @r4+,r1             ! dest (0 = end)
+        tst     r1,r1
+        bt      bt_e
+        mov.l   @r4+,r2             ! src
+        mov.l   @r4+,r3             ! len
+bt_c:   mov.b   @r2+,r0
+        mov.b   r0,@r1
+        dt      r3
+        bf/s    bt_c
+        add     #1,r1
+        bra     bt_l
+        nop
+bt_e:   rts
+        nop
+
+        .align 1
+x_2e8:  .word 0x2E8
+x_2e0:  .word 0x2E0
+x_1000: .word 1000
+        .align 2
+x_vars:    .long v_mode
+x_hudcode: .long 0x0C27ECD4
+x_hud3:    .long 0x0009E703     ! nop / mov #3,r7
+x_hud2:    .long 0xEA63E702     ! mov #99,r10 / mov #2,r7 (original)
+x_se:      .long 0x0C282860
+x_voice:   .long 0x0C276900
+x_getrank: .long 0x0C1F9F80
+x_speedfn: .long 0x0C1F37A0
+x_div:     .long udiv
+bt_tab:
+        .long 0x0C30D230, t_title, 26
+        .long 0x0C30D25A, t_date, 10
+        .long 0x0C30D268, t_warn, 416
+        .long 0x0C30D408, t_wdate, 20
+        .long 0
+t_title: .ascii "       SDOJ RESURRECTED   "
+t_date:  .ascii "2026.10.30"
+t_wdate: .ascii "          2026/10/30"
+t_warn:
+        .ascii "   THIS PROJECT IS UNOFFICIAL "
+        .byte 0,0
+        .ascii "   AND IS NOT AFFILIATED WITH,"
+        .byte 0,0
+        .ascii "   ENDORSED BY, OR AUTHORIZED "
+        .byte 0,0
+        .ascii "   BY CAVE. ALL RIGHTS TO THE "
+        .byte 0,0
+        .ascii "   ORIGINAL GAME AND ITS      "
+        .byte 0,0
+        .ascii "   ASSOCIATED INTELLECTUAL    "
+        .byte 0,0
+        .ascii "   PROPERTY REMAIN WITH THEIR "
+        .byte 0,0
+        .ascii "   RESPECTIVE RIGHTS HOLDERS. "
+        .byte 0,0
+        .ascii "                              "
+        .byte 0,0
+        .ascii "                              "
+        .byte 0,0
+        .ascii "          HAVE FUN!!!         "
+        .byte 0,0
+        .ascii "                              "
+        .byte 0,0
+        .ascii "                              "
+        .byte 0,0
+        .align 2
 
 ! ================================================================ menu text
         .align 2

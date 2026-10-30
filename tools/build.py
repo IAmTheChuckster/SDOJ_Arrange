@@ -28,6 +28,9 @@ HOOKS = {
     'kill_hook':    [0x0C1F6C04, 0x0C20B3E4, 0x0C20B434, 0x0C21AC0C, 0x0C22AAAC],
     'bee_hook':     [0x0C22A030],
     'popup_hook':   [0x0C22AAB0],
+    'getrank_hook': [0x0C1FDD94],
+    'speed_hook':   [0x0C1FE734],
+    'v_hudrank':    [0x0C27EDF0],
     'bombitem_hook': [0x0C22A508],
     'shot_stub0':  [0x0C2173B4],
     'shot_stub1':  [0x0C217670],
@@ -52,6 +55,9 @@ ORIG = {
     0x0C21AC0C: 0x0C1FA320, 0x0C22AAAC: 0x0C1FA320,
     0x0C22A030: 0x0C22A8F0,
     0x0C22AAB0: 0x0C2778E0,
+    0x0C1FDD94: 0x0C1F9F80,
+    0x0C1FE734: 0x0C1F37A0,
+    0x0C27EDF0: 0x0C661B48,
     0x0C22A508: 0x0C1F7D50,
     0x0C2173B4: 0x0C2173D0,
     0x0C217670: 0x0C217680,
@@ -94,7 +100,7 @@ def asm_link(src, base, tmp, name):
     return open(binf, 'rb').read(), syms
 
 
-def loader_source(blob_len, table):
+def loader_source(blob_len, table, init_addr):
     words = (blob_len + 3) // 4
     lines = [
         '        .section .text',
@@ -120,7 +126,10 @@ def loader_source(blob_len, table):
         '        bf      tl               ! unexpected program: leave it alone',
         '        bra     tl',
         '        mov.l   r4,@r2',
-        'done:   mov.l   l_main,r0',
+        'done:   mov.l   l_init,r0         ! boot text etc.',
+        '        jsr     @r0',
+        '        nop',
+        '        mov.l   l_main,r0',
         '        jmp     @r0',
         '        nop',
         '        .align 2',
@@ -128,6 +137,7 @@ def loader_source(blob_len, table):
         'l_dst:  .long 0x%08X' % RAM_BASE,
         'l_cnt:  .long %d' % words,
         'l_main: .long 0x%08X' % MAIN_ENTRY,
+        'l_init: .long 0x%08X' % init_addr,
         'table:',
     ]
     for addr, orig, new in table:
@@ -146,7 +156,7 @@ def main():
         for a in addrs:
             table.append((a, ORIG[a], syms[sym]))
     lsrc = os.path.join(tmp, 'loader.s')
-    open(lsrc, 'w').write(loader_source(len(blob), table))
+    open(lsrc, 'w').write(loader_source(len(blob), table, syms['boot_init']))
     loader, _ = asm_link(lsrc, 0xA0000000 | ROM_LOADER, tmp, 'loader')
 
     # changes in big-endian u4 coordinates
