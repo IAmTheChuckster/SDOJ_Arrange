@@ -75,7 +75,7 @@ Literal redirections (no code overwritten): title 0x0C221344/0x0C2222D4/0x0C222C
 0x0C2212AC/0x0C221308, draw number 0x0C2212B4, TryBomb 0x0C211C0C, ActivateHyper 0x0C21291C,
 GP bonus 0x0C1F6E70/0x0C27AFFC/0x0C27C730/0x0C27D1B8, GaugeEvent 0x0C1F6C04/0x0C20B3E4/0x0C20B434/
 0x0C21AC0C/0x0C22AAAC (death call 0x0C1F5E5C left alone), hidden bee 0x0C22A030.
-Variables at 0x0CE00000: mode (0 Arcade, 1 1.5+, 2 Resurrection), menu cursor, menu flag, no-hyper flag.
+Variables at 0x0CE00000: mode (always 1 = Resurrected; title shows a gold RESURRECTED slide via draw mode 0x0C1EBCC0(0) + colour 0x806020), menu cursor, menu flag, no-hyper flag.
 
 ## Dress select
 - Task 0x0C274170 (literal 0x0C274100); data block from 0x0C1E62E0(task id). Block +0x1A8 = dress shown in the label/description (display only); the costume and the real choice are kept separately.
@@ -88,7 +88,7 @@ Variables at 0x0CE00000: mode (0 Arcade, 1 1.5+, 2 Resurrection), menu cursor, m
   Type-C 0x0C218D80/218FE0/2193E0/2196B0 (each installed via one literal). The laser uses other routines (0x0C21AA..).
 - Enemy bullets: list at [[0x0C4C8978]+0x30DFC]+0x14, next at +4, state +0 (2 = flying, 3 = cancelling),
   x/y at +0x2C/+0x30. 0x0C1FE220 (flag, player) cancels every state 1/2 bullet in that list (flag 1 = big stars).
-- Hyper GP/HYPER Lv: +0x2E8 is the HUD HYPER Lv (level-ups during hyper via 0x0C1FA490); GP in 1.5+ uses +0x2EC + +0x2E8.
+- Hyper GP/HYPER Lv: +0x2E8 is the HUD HYPER Lv (level-ups during hyper via 0x0C1FA490); GP in Resurrected uses +0x2EC + +0x2E8.
 - Chain x GP is computed in 32 bits (0x0C1F6ECC, 0x0C1F706E): it overflows above 2^31 / percent (original game; left as is).
 
 ## Rank
@@ -96,7 +96,7 @@ Variables at 0x0CE00000: mode (0 Arcade, 1 1.5+, 2 Resurrection), menu cursor, m
 - 0x0C661B48 = max player rank (via 0x0C1F9F80, literal 0x0C1FDD94); HUD draws it (0x0C27EC80, literal 0x0C27EDF0, 2 digits, cap 99).
 - Difficulty D 0x0C4C897C = table 0x0C4C8768[rank] (0..30; +1 per rank to 10, then +1 per 2), x0.75 when nobody is in hyper,
   floor by table 0x0C4C8900, cap 50. D is added to every enemy bullet's speed at spawn (0x0C1FE5CC).
-- 1.5+: rank to 999, table index kept at 50, bullet speed x(1 + (rank-50)/1000) via the speed-part call literal 0x0C1FE734.
+- Resurrected: rank to 999, table index kept at 50, bullet speed x(1 + (rank-50)/1000) via the speed-part call literal 0x0C1FE734.
 
 ## Sound
 - Hyper stock increase (HUD task 0x0C213C74): 0x0C282860 (SE) + 0x0C276900(9,70) = "HYPER SYSTEM READY" voice.

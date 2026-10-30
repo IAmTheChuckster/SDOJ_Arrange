@@ -25,6 +25,9 @@ v_lastbombs: .long 0    ! player bombs seen last frame
 v_gpfix:    .long 0     ! GP bonus fixed at hyper start (0 = not set)
 v_hudrank:  .long 0     ! real (uncapped) rank, shown on the HUD
 v_lastlv:   .long 0     ! HYPER Lv seen last frame (voice)
+v_tlast:    .long 0     ! frame counter at the last title frame
+v_tstart:   .long 0     ! frame counter when the title started
+v_tx:       .long -1    ! x of RESURRECTED on the title (-1 = hidden)
 
         .org 0x100
 ! ---------------------------------------------------------------- game addresses
@@ -45,81 +48,113 @@ v_lastlv:   .long 0     ! HYPER Lv seen last frame (voice)
 ! r4 = title object. Runs the mode menu while credits > 0.
         .global title_hook
 title_hook:
+        ! Resurrected only: no mode menu, the game always plays as Resurrected (mode 1).
+        ! RESURRECTED slides in at the bottom after the announcer says "SAIDAIOUJOU".
         sts.l   pr,@-r15
-        mov.l   r4,@-r15
+        mov.l   r8,@-r15
         mov.l   l_vars0,r1
-        mov.l   l_credits,r2
-        mov.l   @r2,r0
-        tst     r0,r0
-        bf      th_menu
-        ! no credit: normal title. Keep the chosen mode for a short grace period
-        ! (the title is still drawn a few frames after START used the last credit),
-        ! then fall back to Arcade so attract demos stay arcade.
-        mov     #0,r0
-        mov.l   r0,@(8,r1)          ! menu = 0
-        mov.l   @(20,r1),r2
-        tst     r2,r2
-        bt      th_reset
-        add     #-1,r2
-        bra     th_call
-        mov.l   r2,@(20,r1)
-th_reset:
-        bra     th_call
-        mov.l   r0,@(0,r1)          ! mode = 0
-th_menu:
         mov     #1,r0
-        mov.l   r0,@(8,r1)          ! menu = 1
-        mov.w   w_grace,r0
-        mov.l   r0,@(20,r1)         ! grace = 240 frames
-        ! show the title text (menu) right away: text-enable flag +0xC30 = 1,
-        ! slide-in offset +0xC34 = 0
-        mov.w   w_c30,r0
-        mov     r4,r2
-        add     r0,r2
-        mov     #1,r0
-        mov.l   r0,@r2
+        mov.l   r0,@(0,r1)          ! mode = Resurrected
         mov     #0,r0
-        mov.l   r0,@(4,r2)
-        mov.l   l_p1in,r2
-        mov.l   @r2,r3              ! held
-        mov.l   @(16,r1),r5         ! prev held
-        mov.l   r3,@(16,r1)
-        not     r5,r5
-        and     r5,r3               ! newly pressed
-        mov.l   @(4,r1),r0          ! sel
-        mov     r3,r5
-        mov     #1,r6
-        tst     r6,r5
-        bt      th_noup
-        add     #-1,r0
+        mov.l   r0,@(8,r1)          ! no menu
+        mov.l   l_fcount,r2
+        mov.l   @r2,r2              ! game frame counter
+        add     #68,r1              ! v_tlast / v_tstart
+        mov.l   @r1,r3
+        mov.l   r2,@r1
+        sub     r3,r2               ! frames since last title frame
+        mov     #3,r3
+        cmp/hs  r3,r2
+        bf      th_cont
+        mov.l   l_fcount,r2         ! title (re)started
+        mov.l   @r2,r2
+        mov.l   r2,@(4,r1)
+th_cont:
+        mov.l   l_fcount,r2
+        mov.l   @r2,r8
+        mov.l   @(4,r1),r3
+        sub     r3,r8               ! r8 = frames since the title started
+        mov.l   l_vars0,r1
+        add     #76,r1              ! v_tx
+        mov     #-1,r0
+        mov.w   w_tvoice,r2         ! wait for the announcer
+        sub     r2,r8
+        cmp/pz  r8
+        bf      th_setx
+        mov     #20,r0              ! slide in from the right over 20 frames
+        sub     r8,r0
         cmp/pz  r0
-        bt      th_noup
-        mov     #1,r0
-th_noup:
-        mov     #2,r6
-        tst     r6,r5
-        bt      th_nodn
-        add     #1,r0
-        mov     #1,r6
-        cmp/gt  r6,r0
-        bf      th_nodn
+        bt      th_x
         mov     #0,r0
-th_nodn:
-        mov.l   r0,@(4,r1)          ! sel
-        mov.l   r0,@(0,r1)          ! mode = sel
-th_call:
-        mov.l   l_hudarc,r0
+th_x:   shll2   r0
+        add     r0,r0               ! 8 px per frame
+        mov.w   w_tx,r2
+        add     r2,r0
+th_setx:
+        mov.l   r0,@r1              ! x of RESURRECTED (-1 = not shown)
+        mov.l   l_orig_title,r0
         jsr     @r0
         nop
-        mov.l   @r15+,r4
-        mov.l   l_orig_title,r0
-        jmp     @r0                 ! tail call, pr restored below first
+        mov.l   l_vars0,r1
+        add     #76,r1
+        mov.l   @r1,r8              ! slide x
+        cmp/pz  r8
+        bf      th_done
+        mov.l   l_drawmode,r0       ! same mode as the rank line
+        jsr     @r0
+        mov     #0,r4
+        mov.l   l_setcol,r0         ! dark outline, like the rank line
+        mov.l   l_shadow,r4
+        jsr     @r0
+        nop
+        mov     r8,r4
+        bsr     th_draw
+        add     #-1,r4
+        mov     r8,r4
+        bsr     th_draw
+        add     #1,r4
+        mov     r8,r4
+        mov.w   w_ty,r5
+        bsr     th_draw1
+        add     #-1,r5
+        mov     r8,r4
+        mov.w   w_ty,r5
+        bsr     th_draw1
+        add     #1,r5
+        mov.l   l_setcol,r0         ! gold text (rank line colour)
+        mov.l   l_gold,r4
+        jsr     @r0
+        nop
+        mov     r8,r4
+        bsr     th_draw
+        nop
+        mov.l   l_drawmode,r0
+        jsr     @r0
+        mov     #1,r4
+        mov.l   l_setcol,r0
+        mov.l   l_white,r4
+        jsr     @r0
+        nop
+th_done:
+        mov.l   @r15+,r8
         lds.l   @r15+,pr
+        rts
+        nop
+th_draw:                            ! draw RESURRECTED at (r4, 220)
+        mov.w   w_ty,r5
+th_draw1:                           ! draw RESURRECTED at (r4, r5)
+        mov     #0x78,r6
+        add     r6,r6               ! r6 = 0xF0
+        mov.l   l_tstr,r7
+        mov.l   l_orig_ds,r0
+        jmp     @r0
+        nop
 
 ! ================================================================ draw string hook
 ! Replace the rank line and the two extend lines with the mode menu.
         .global ds_hook
 ds_hook:
+ds_menu:
         mov.l   l_vars0,r1
         mov.l   @(8,r1),r0
         tst     r0,r0
@@ -187,6 +222,11 @@ dn_go:
 
         .align 1
 w_ylim: .word 0xCC
+w_tvoice: .word 160
+w_tx:   .word 76
+w_ty:   .word 220
+w_b8:   .word 0xB8
+w_tcol: .word 0xF0
 w_grace: .word 240
 w_c30:  .word 0xC30
 w_yb6:  .word 0xB6
@@ -196,6 +236,14 @@ l_vars0:      .long v_mode
 l_credits:    .long CREDITS
 l_p1in:       .long P1IN
 l_orig_title: .long ORIG_TITLE
+l_fcount:     .long 0x0C5F7D60
+l_setcol:     .long 0x0C1DD4B4
+l_shadow:     .long 0x002A200A
+l_textcol:    .long 0x00206080
+l_white:      .long 0x00808080
+l_gold:       .long 0x00806020
+l_drawmode:   .long 0x0C1EBCC0
+l_tstr:       .long s_resur
 l_hudarc:     .long hud_arcade
 l_rank_lo:    .long 0x0C30D590
 l_rank_hi:    .long 0x0C30D5D8
@@ -990,6 +1038,9 @@ ud_e:   rts
 ! boot text (runs from the loader before the game starts)
         .global boot_init
 boot_init:
+        mov.l   x_vars,r1
+        mov     #1,r0
+        mov.l   r0,@r1              ! always Resurrected (attract demos too)
         mova    bt_tab,r0
         mov     r0,r4
 bt_l:   mov.l   @r4+,r1             ! dest (0 = end)
@@ -1069,5 +1120,6 @@ s_arc_off: .asciz "  ARCADE"
 s_15_on:   .asciz "> 1.5+"
 s_15_off:  .asciz "  1.5+"
 s_blank:   .asciz " "
+s_resur:   .asciz "RESURRECTED"
         .align 2
 _end:
