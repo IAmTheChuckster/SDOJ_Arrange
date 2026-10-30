@@ -412,8 +412,8 @@ l2_rankadd:      .long 0x0C3387F0   ! rank added per hyper level
 l2_hyplvframe:   .long hyplv_frame
 
 ! ================================================================ gauge event hook
-! p r4, amount r5, type r6.  1.5+: gauge fills 3x outside hyper; during hyper it keeps
-! filling at the normal Arcade amounts (x1) and raises HYPER Lv.
+! p r4, amount r5, type r6.  1.5+: gauge fills 3x outside hyper; during hyper nothing
+! fills it (only bees raise HYPER Lv).
 ! During a bee pickup in 1.5+ the bee's own combo-based gauge gain is skipped.
         .global kill_hook
 kill_hook:
@@ -430,7 +430,7 @@ kh_nobee:
         mov.w   w3_2e0,r0
         mov.l   @(r0,r4),r0         ! hyper active?
         tst     r0,r0
-        bf      kh_hyper            ! in hyper
+        bf      kh_inhyper          ! in hyper
         mov     r5,r0               ! not in hyper: amount * 3
         add     r5,r5
         add     r0,r5
@@ -438,6 +438,9 @@ kh_orig:
         mov.l   l3_orig_kill,r0
         jmp     @r0
         nop
+kh_inhyper:                         ! 1.5+ in hyper: kills and laser hits add nothing
+        rts                         ! (only bees raise HYPER Lv)
+        mov     #0,r0
 kh_hyper:
         sts.l   pr,@-r15
         mov.l   r8,@-r15
