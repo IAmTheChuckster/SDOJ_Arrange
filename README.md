@@ -5,7 +5,7 @@ Why did I make this? Because it's fun and for my own personal research to see th
 While Claude was used I put effort in making sure there are balanced gameplay.<br> 
 I did all the testing and planning.
 
-## What it changes
+## Patch Notes
 
 ### Title screen
 There is no mode menu: insert a coin and press **START** to play Resurrected. After the announcer says "SAIDAIOUJOU", a gold **RESURRECTED** slides in at the bottom of the title screen. Attract demos also play as Resurrected.
