@@ -932,7 +932,7 @@ gr_ret: lds.l   @r15+,pr
         rts
         nop
 
-! bullet speed: above rank 50, +0.1% per rank (1.5+). Hooks the speed-part call in
+! bullet speed (1.5+): rank 51-100 +0.2% per rank (+10% at 100), then +0.1% per rank (+99.9% at 999). Hooks the speed-part call in
 ! the bullet spawn; the caller's r9 holds base speed + rank bonus at this point.
         .global speed_hook
 speed_hook:
@@ -947,9 +947,14 @@ speed_hook:
         bf      sp_ret
         mov.l   @(60,r1),r2         ! rank
         mov     #50,r3
-        sub     r3,r2
-        cmp/pl  r2
+        cmp/gt  r3,r2
         bf      sp_ret
+        mov     #100,r3             ! extra per mille: 2*(rank-50) up to 100, then rank
+        cmp/gt  r3,r2
+        bt      sp_mul
+        add     #-50,r2
+        add     r2,r2
+sp_mul:
         mov     r9,r3
         add     r0,r3
         add     #48,r3              ! speed the game is about to use
