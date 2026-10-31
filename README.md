@@ -1,5 +1,7 @@
 # SDOJ Resurrected
-
+## To Do
+1. Adjust the bee medals so it's 10000PTS+hit counter
+   
 ## About this project
 Why did I make this? Because it's fun and for my own personal research to see the capabilities of Claude.<br> 
 While Claude was used I put effort in making sure there are balanced gameplay.<br> 
