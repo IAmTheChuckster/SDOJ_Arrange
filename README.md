@@ -6,6 +6,7 @@
 4. fix mra title name from SDOJ Resurrected (2012/ 4/20)
 5. Add boss timers
 6. add revenge bullets in hyper
+7. Add `Inbachi OK` or `Hibachi OK` labels depending as long as the requirements are met
    
 ## About this project
 Why did I make this? Because it's fun and for my own personal research to see the capabilities of Claude.<br> 
