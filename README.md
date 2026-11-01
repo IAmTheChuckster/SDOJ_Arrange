@@ -3,6 +3,7 @@
 1. Adjust the bee medals so it's **10000PTS x hit**, with the last one being **10000PTS x hit x 2**
 2. uncap the hit count
 3. make all dresses expert mode and expert weapon
+4. fix mra title name from SDOJ Resurrected (2012/ 4/20)
    
 ## About this project
 Why did I make this? Because it's fun and for my own personal research to see the capabilities of Claude.<br> 
