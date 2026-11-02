@@ -1,4 +1,8 @@
 # SDOJ Resurrected
+A patch for `add sdoj info`
+This repository holds only source, tools and notes. No ROM data is included; you patch your own legally owned dump
+
+
 ## To Do
 1. Adjust the bee medals so it's **10000PTS x hit**, with the last one being **10000PTS x hit x 2** (waiting for claude)
 2. uncap the hit count (waiting for claude)
