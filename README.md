@@ -1,12 +1,14 @@
 # SDOJ Resurrected
 ## To Do
-1. Adjust the bee medals so it's **10000PTS x hit**, with the last one being **10000PTS x hit x 2**
-2. uncap the hit count
-3. make all dresses expert mode and expert weapon
-4. fix mra title name from SDOJ Resurrected (2012/ 4/20)
-5. Add boss timers
-6. add revenge bullets in hyper
-7. Add `Inbachi OK` or `Hibachi OK` labels depending as long as the requirements are met and the numbers of bees collected if can fit
+1. Adjust the bee medals so it's **10000PTS x hit**, with the last one being **10000PTS x hit x 2** (waiting for claude)
+2. uncap the hit count (waiting for claude)
+3. bomb and 1UP cancels bullets into big stars
+4. extra score drops 1UP icons
+5. make all dresses expert mode and expert weapon
+6. fix mra title name from SDOJ Resurrected (2012/ 4/20)
+7. Add boss timers
+8. add revenge bullets in hyper
+9. Add `Inbachi OK` or `Hibachi OK` labels depending as long as the requirements are met and the numbers of bees collected if can fit
    
 ## About this project
 Why did I make this? Because it's fun and for my own personal research to see the capabilities of Claude.<br> 
