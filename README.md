@@ -8,7 +8,8 @@
 6. fix mra title name from SDOJ Resurrected (2012/ 4/20)
 7. Add boss timers
 8. add revenge bullets in hyper
-9. Add `Inbachi OK` or `Hibachi OK` labels depending as long as the requirements are met and the numbers of bees collected if can fit
+9. feed it the 360 arrange mode and import the enemy healthbars
+10. Add `Inbachi OK` or `Hibachi OK` labels depending as long as the requirements are met and the numbers of bees collected if can fit
    
 ## About this project
 Why did I make this? Because it's fun and for my own personal research to see the capabilities of Claude.<br> 
