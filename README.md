@@ -1,5 +1,5 @@
 # SDOJ Resurrected
-A patch for `add sdoj info`
+A patch for `add sdoj info`<br>
 This repository holds only source, tools and notes. No ROM data is included; you patch your own legally owned dump
 
 
