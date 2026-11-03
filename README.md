@@ -6,14 +6,15 @@ This repository holds only source, tools and notes. No ROM data is included; you
 ## To Do
 1. Adjust the bee medals so it's **10000PTS x hit**, with the last one being **10000PTS x hit x 2** (waiting for claude)
 2. uncap the hit count (waiting for claude)
-3. bomb and 1UP cancels bullets into big stars
-4. extra score drops 1UP icons
-5. make all dresses expert mode and expert weapon
-6. fix mra title name from SDOJ Resurrected (2012/ 4/20)
-7. Add boss timers
-8. add revenge bullets in hyper
-9. feed it the 360 arrange mode and import the enemy healthbars
-10. Add `Inbachi OK` or `Hibachi OK` labels depending as long as the requirements are met and the numbers of bees collected if can fit
+3. when not in hyper bullets over enemies or near proximities cancels in to small stars and cancelled bullets also cancels other bullets in close proximity.
+4. bomb and 1UP cancels bullets into big stars
+5. extra score drops 1UP icons
+6. make all dresses expert mode and expert weapon
+7. fix mra title name from SDOJ Resurrected (2012/ 4/20)
+8. Add boss timers
+9. add revenge bullets in hyper
+10. feed it the 360 arrange mode and import the enemy healthbars
+11. Add `Inbachi OK` or `Hibachi OK` labels depending as long as the requirements are met and the numbers of bees collected if can fit
    
 ## About this project
 Why did I make this? Because it's fun and for my own personal research to see the capabilities of Claude.<br> 
