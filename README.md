@@ -33,13 +33,13 @@ You need your own **ddpsdoj.zip** (MAME set, DoDonPachi SaiDaiOuJou 2012/4/20) c
 
 - `arr_u4` - the patched program ROM (CRC `bee48395`)
 - `ddpsdojarr.zip` - your set with u4 replaced by `arr_u4`
-- `DoDonPachi_SaiDaiOuJou_Arrange.mra` - the MiSTer MRA
+- `DoDonPachi SaiDaiOuJou Arrange.mra` - the MiSTer MRA
 
 ### Web patcher
 1. Open the [web patcher](https://iamthechuckster.github.io/SDOJ_Arrange/).
 2. Load your `ddpsdoj.zip` (or a loose u4 file). Everything is processed in your browser and nothing is uploaded.
 3. Check that the files show as OK.
-4. Download **ddpsdojarr.zip**, **DoDonPachi_SaiDaiOuJou_Arrange.mra** and **arr_u4.zip** or **arr_u4**.
+4. Download **ddpsdojarr.zip**, **DoDonPachi SaiDaiOuJou Arrange.mra** and **arr_u4.zip** or **arr_u4**.
 
 ### Python script
 Needs Python 3 and no extra packages. Download `sdoj_patch.py` and `sdoj_patch_data.py` into the same folder, then run:
@@ -48,11 +48,11 @@ Needs Python 3 and no extra packages. Download `sdoj_patch.py` and `sdoj_patch_d
 python3 sdoj_patch.py ddpsdoj.zip --zip --mra
 ```
 
-`--zip` writes `ddpsdojarr.zip`, `--mra` writes `DoDonPachi_SaiDaiOuJou_Arrange.mra` (it needs the .mra from this repository next to the script), and `-o FILE` sets the output path for `arr_u4`. A loose u4 can be given instead of the zip (without `--zip`).
+`--zip` writes `ddpsdojarr.zip`, `--mra` writes `DoDonPachi SaiDaiOuJou Arrange.mra` (it needs the .mra from this repository next to the script), and `-o FILE` sets the output path for `arr_u4`. A loose u4 can be given instead of the zip (without `--zip`).
 
 ### Using the patched files
 - **MAME 0.289**: copy your `ddpsdoj.zip`, rename `arr_u4` to `u4` inside the copy, and run `mame ddpsdoj`. MAME will warn about the changed u4 checksum - that is expected.
-- **MiSTer CV1k**: copy `ddpsdojarr.zip` to `games/mame` and `DoDonPachi_SaiDaiOuJou_Arrange.mra` to `_Arcade`.
+- **MiSTer CV1k**: copy `ddpsdojarr.zip` to `games/mame` and `DoDonPachi SaiDaiOuJou Arrange.mra` to `_Arcade`.
 
 Developers: `src/patch.s` is the SH-3 source; `python3 tools/build.py` (needs SH binutils such as `binutils-sh4-linux-gnu`) regenerates `sdoj_patch_data.py`; then `python3 tools/make_web.py ddpsdoj.zip` regenerates `index.html`, the .mra CRC and this README's CRC. The patch adds a small boot loader in unused u4 space that copies the new code to free work RAM (0x0CE00000) and redirects a few code pointers in the unpacked program. Research notes are in `docs/ddpsdoj-notes.md`.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate index.html (browser patcher) and DoDonPachi_SaiDaiOuJou_Arrange.mra
+"""Generate index.html (browser patcher) and DoDonPachi SaiDaiOuJou Arrange.mra
 from sdoj_patch_data.py. Needs your original ddpsdoj.zip only to compute
 the patched u4 CRC (no ROM data is written anywhere).
 
@@ -39,7 +39,7 @@ def main():
         test[off:off + len(d)] = d
     assert bytes(test) == patched, 'web patch table does not reproduce the Python patcher'
 
-    mra_path = os.path.join(ROOT, 'DoDonPachi_SaiDaiOuJou_Arrange.mra')
+    mra_path = os.path.join(ROOT, 'DoDonPachi SaiDaiOuJou Arrange.mra')
     mra = open(mra_path).read()
     mra = re.sub(r'(<part name="arr_u4" crc=")[0-9a-fA-F]{8}', lambda m: m.group(1) + '%08x' % pcrc, mra)
     open(mra_path, 'w').write(mra)
@@ -69,7 +69,7 @@ def main():
     rd = open(rp).read()
     rd = re.sub(r'(the patched program ROM \(CRC `)[0-9a-f]{8}', lambda m: m.group(1) + '%08x' % pcrc, rd)
     open(rp, 'w').write(rd)
-    print('patched u4 CRC %08x, build %s -> index.html, DoDonPachi_SaiDaiOuJou_Arrange.mra' % (pcrc, build))
+    print('patched u4 CRC %08x, build %s -> index.html, DoDonPachi SaiDaiOuJou Arrange.mra' % (pcrc, build))
 
 
 if __name__ == '__main__':

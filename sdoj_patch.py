@@ -7,7 +7,7 @@ Usage:
 Reads your own ddpsdoj (DoDonPachi SaiDaiOuJou) ROM set (or a loose u4 file) and
 writes the patched program ROM arr_u4 (or -o FILE).
   --zip   also write ddpsdojarr.zip: your set with u4 replaced by arr_u4
-  --mra   also write "DoDonPachi_SaiDaiOuJou_Arrange.mra" (MiSTer), with the patched CRC
+  --mra   also write "DoDonPachi SaiDaiOuJou Arrange.mra" (MiSTer), with the patched CRC
 The original files are not modified.
 """
 import os, re, sys, zipfile, zlib
@@ -88,10 +88,10 @@ def main():
                     zout.writestr(n, zin.read(n))
         print('wrote ddpsdojarr.zip')
     if want_mra:
-        mra = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'DoDonPachi_SaiDaiOuJou_Arrange.mra')).read()
+        mra = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'DoDonPachi SaiDaiOuJou Arrange.mra')).read()
         mra = re.sub(r'(<part name="arr_u4" crc=")[0-9a-fA-F]{8}', lambda m: m.group(1) + '%08x' % nc, mra)
-        open('DoDonPachi_SaiDaiOuJou_Arrange.mra', 'w').write(mra)
-        print('wrote DoDonPachi_SaiDaiOuJou_Arrange.mra')
+        open('DoDonPachi SaiDaiOuJou Arrange.mra', 'w').write(mra)
+        print('wrote DoDonPachi SaiDaiOuJou Arrange.mra')
 
 
 if __name__ == '__main__':
