@@ -817,6 +817,38 @@ bi_vars:   .long v_mode
 bi_orig:   .long 0x0C1F7D50
 bi_cancel: .long CANCEL
 
+! ================================================================ 1UP item (1.5+)
+! 0x0C1F7470 (add a life) is called by the 1UP item pickup (literal 0x0C22A8CC): cancel bullets into big stars.
+        .global life_hook
+life_hook:
+        sts.l   pr,@-r15
+        mov.l   r8,@-r15
+        mov.l   r9,@-r15
+        mov     r4,r8
+        mov.l   lh_orig,r0
+        jsr     @r0
+        nop
+        mov     r0,r9
+        mov.l   lh_vars,r1
+        mov.l   @r1,r0
+        cmp/eq  #1,r0
+        bf      lh_ret
+        mov     #32,r4
+        mov     r8,r5
+        mov.l   lh_cancel,r0
+        jsr     @r0
+        mov     #1,r6
+lh_ret: mov     r9,r0
+        mov.l   @r15+,r9
+        mov.l   @r15+,r8
+        lds.l   @r15+,pr
+        rts
+        nop
+        .align 2
+lh_orig:   .long 0x0C1F7470
+lh_vars:   .long v_mode
+lh_cancel: .long CANCEL
+
 
 ! ================================================================ proximity cancel
 ! Every frame (r4 = player): bullets that fly within 24 px of an enemy (any bullet

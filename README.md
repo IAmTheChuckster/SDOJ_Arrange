@@ -20,6 +20,7 @@ The boot screen shows **SDOJ RESURRECTED 2026.11.5**, and the warning screen sho
 - **Expert weapon**: every dress uses the Expert shot and laser. You still pick your ship and dress, but the dress only changes the look.
 - **Bombs**: **6 bomb slots** for every dress type; you start with **3 bombs** and each death gives **+1 bomb** (up to 6).
 - **Bomb items** cancel all bullets on screen into big stars.
+- **1UP items** (e.g. the hidden one from the stage 4 mid boss) also cancel all bullets on screen into big stars when picked up (still untested in play).
 - **Hyper meter** fills **3 times as fast** as the original game outside hyper (death bonus unchanged). During a hyper kills and laser hits add nothing; hidden bees raise **HYPER Lv**, and **every star you pick up fills the meter** (9, the same as a small kill outside hyper).
 - **GP bonus during hyper** by the hyper level at the start of the hyper (hypers spent): Lv1 x2.0, Lv2 x2.2, Lv3 x2.4, Lv4 x2.6, Lv5 x2.8, Lv6-10 x3.0 (original: x1.1-x1.5, then x2.2-x3.0). It stays the same until the hyper ends, even if HYPER Lv goes up.
 - **Rank up to 999**: rank no longer stops at 50 (the HUD shows 3 digits). Up to 50 it works as in the original game; above 50 enemy bullets get faster: +0.2% per rank up to rank 100 (+10%), then +0.1% per rank (200 +20%, 500 +50%, 999 +99.9%), compared with rank 50. Rank still goes up with hypers and down with bombs.
