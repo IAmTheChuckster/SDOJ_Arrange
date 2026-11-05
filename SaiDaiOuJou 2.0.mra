@@ -1,5 +1,5 @@
 <!--
-  ikacore_CV1k MRA - DoDonPachi SaiDaiOuJou 2.0 (2026/11/5).
+  ikacore_CV1k MRA - DoDonPachi SaiDaiOuJou 2.0 (2026/11/6).
   
   Rom order is deliberate - DDR3 first, index 0 LAST.  Index 0's download
   is what finally releases the CPU, so every image is in place before the
@@ -28,7 +28,7 @@
 -->
 <misterromdescription>
     <about author="ika-musume" source="https://github.com/ika-musume/ikacore_CV1k"/>
-    <name>DoDonPachi SaiDaiOuJou 2.0 (2026/11/5)</name>
+    <name>DoDonPachi SaiDaiOuJou 2.0 (2026/11/6)</name>
     <setname>ddpsdoj20</setname>
     <year>2026</year>
     <manufacturer>Cave</manufacturer>
@@ -49,7 +49,7 @@
     <nvram index="3" size="135680"/>
 
     <rom index="0" zip="ddpsdoj20.zip" md5="none">
-        <part name="sdoj2_u4" crc="cefe1586" length="0x400000"/>
+        <part name="sdoj2_u4" crc="bee48395" length="0x400000"/>
     </rom>
 
     <buttons names="Laser,Hyper,Rapid Shot,Bomb,Start,Coin,Test,Service,Save State" default="A,B,X,Y,Start,R,L,Select"/>

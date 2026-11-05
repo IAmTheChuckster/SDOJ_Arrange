@@ -9,7 +9,7 @@ _start:
 ! ---------------------------------------------------------------- variables
         .org 0x000
 v_mode:     .long 0     ! 0 = Arcade, 1 = 1.5+, 2 = SDOJ Resurrection (placeholder)
-v_sel:      .long 0     ! menu cursor 0..2
+v_sel:      .long 1     ! title mode: 1 = Arrange, 0 = Original
 v_menu:     .long 0     ! 1 while the mode menu is shown on the title
 v_nohyp:    .long 0     ! 1 = this bomb press must not start a hyper (button 4)
 v_prevheld: .long 0     ! P1 held bits last title frame (edge detect)
@@ -32,6 +32,8 @@ v_ncinit:   .long 0     ! proximity cancel: tables cleared
 v_ncframe:  .long 0     ! proximity cancel: frame counter
 v_ncprev:   .long 0     ! proximity cancel: bullets cancelled last frame (cascade seeds)
 v_nobomb:   .long 0     ! 1 = button 2 pressed: it must never bomb (offset 92)
+v_applied:  .long 1     ! mode written into the game (1 = Arrange) (offset 96)
+v_tab:      .long 0     ! loader table for mode_apply, set by the loader (offset 100)
 
         .org 0x100
 ! ---------------------------------------------------------------- game addresses
@@ -49,109 +51,107 @@ v_nobomb:   .long 0     ! 1 = button 2 pressed: it must never bomb (offset 92)
         .equ P1IN,         0x0C1DCD6C   ! +0 held
 
 ! ================================================================ title hook
-! r4 = title object. Runs the mode menu while credits > 0.
+! r4 = title object. Mode lines on the title: Original Mode (stock game) /
+! Arrange Mode (this patch). Up/Down toggles. The choice rewrites the game's literal
+! pointers and code patches (the loader table in u4) so Original is fully unpatched.
         .global title_hook
 title_hook:
-        ! Resurrected only: no mode menu, the game always plays as Resurrected (mode 1).
-        ! RESURRECTED slides in at the bottom after the announcer says "SAIDAIOUJOU".
         sts.l   pr,@-r15
         mov.l   r8,@-r15
+        mov.l   r9,@-r15
+        mov     r4,r9
         mov.l   l_vars0,r1
         mov     #1,r0
-        mov.l   r0,@(0,r1)          ! mode = Resurrected
+        mov.l   r0,@(0,r1)          ! mode = 1 (hooks run only when patched in)
         mov     #0,r0
         mov.l   r0,@(8,r1)          ! no menu
-        mov.l   l_fcount,r2
-        mov.l   @r2,r2              ! game frame counter
-        add     #68,r1              ! v_tlast / v_tstart
-        mov.l   @r1,r3
-        mov.l   r2,@r1
-        sub     r3,r2               ! frames since last title frame
-        mov     #3,r3
-        cmp/hs  r3,r2
-        bf      th_cont
-        mov.l   l_fcount,r2         ! title (re)started
-        mov.l   @r2,r2
-        mov.l   r2,@(4,r1)
-th_cont:
-        mov.l   l_fcount,r2
-        mov.l   @r2,r8
-        mov.l   @(4,r1),r3
-        sub     r3,r8               ! r8 = frames since the title started
-        mov.l   l_vars0,r1
-        add     #76,r1              ! v_tx
-        mov     #-1,r0
-        mov.w   w_tvoice,r2         ! wait for the announcer
-        sub     r2,r8
-        cmp/pz  r8
-        bf      th_setx
-        mov     #20,r0              ! slide in from the right over 20 frames
-        sub     r8,r0
-        cmp/pz  r0
-        bt      th_x
-        mov     #0,r0
-th_x:   shll2   r0
-        add     r0,r0               ! 8 px per frame
-        mov.w   w_tx,r2
-        add     r2,r0
-th_setx:
-        mov.l   r0,@r1              ! x of RESURRECTED (-1 = not shown)
+        mov.l   l_p1in,r2
+        mov.l   @r2,r3              ! held
+        mov.l   @(16,r1),r5         ! previous held
+        mov.l   r3,@(16,r1)
+        not     r5,r5
+        and     r5,r3               ! newly pressed
+        mov     #3,r6               ! up (1) / down (2)
+        tst     r6,r3
+        bt      th_noin
+        mov.l   @(4,r1),r0
+        xor     #1,r0
+        mov.l   r0,@(4,r1)          ! sel: 1 = Arrange, 0 = Original
+th_noin:
+        mov.l   @(4,r1),r8
+        add     #96,r1
+        mov.l   @r1,r2              ! applied mode
+        cmp/eq  r8,r2
+        bt      th_ok
+        mov.l   r8,@r1
+        mov.l   l_apply,r0
+        jsr     @r0
+        mov     r8,r4
+th_ok:
+        mov     r9,r4
         mov.l   l_orig_title,r0
         jsr     @r0
-        nop
-        mov.l   l_vars0,r1
-        add     #76,r1
-        mov.l   @r1,r8              ! slide x
-        cmp/pz  r8
-        bf      th_done
-        mov.l   l_drawmode,r0       ! same mode as the rank line
-        jsr     @r0
-        mov     #0,r4
-        mov.l   l_setcol,r0         ! dark outline, like the rank line
-        mov.l   l_shadow,r4
-        jsr     @r0
-        nop
-        mov     r8,r4
-        bsr     th_draw
-        add     #-1,r4
-        mov     r8,r4
-        bsr     th_draw
-        add     #1,r4
-        mov     r8,r4
-        mov.w   w_ty,r5
-        bsr     th_draw1
-        add     #-1,r5
-        mov     r8,r4
-        mov.w   w_ty,r5
-        bsr     th_draw1
-        add     #1,r5
-        mov.l   l_setcol,r0         ! gold text (rank line colour)
-        mov.l   l_gold,r4
-        jsr     @r0
-        nop
-        mov     r8,r4
-        bsr     th_draw
         nop
         mov.l   l_drawmode,r0
         jsr     @r0
         mov     #1,r4
+        mov.l   l_setcol,r0         ! gold, game font
+        mov.l   l_gold,r4
+        jsr     @r0
+        nop
+        mov.l   l_s_or_on,r7        ! Original Mode
+        tst     r8,r8
+        bt      th_o1
+        mov.l   l_s_or_off,r7
+th_o1:  mov.w   w_my1,r5
+        bsr     th_line
+        mov     #60,r4
+        mov.l   l_s_ar_off,r7       ! Arrange Mode
+        tst     r8,r8
+        bt      th_a1
+        mov.l   l_s_ar_on,r7
+th_a1:  mov.w   w_my2,r5
+        bsr     th_line
+        mov     #60,r4
         mov.l   l_setcol,r0
         mov.l   l_white,r4
         jsr     @r0
         nop
-th_done:
+        mov.l   @r15+,r9
         mov.l   @r15+,r8
         lds.l   @r15+,pr
         rts
         nop
-th_draw:                            ! draw RESURRECTED at (r4, 220)
-        mov.w   w_ty,r5
-th_draw1:                           ! draw RESURRECTED at (r4, r5)
+th_line:                            ! draw string r7 at (r4, r5)
         mov     #0x78,r6
         add     r6,r6               ! r6 = 0xF0
-        mov.l   l_tstr,r7
         mov.l   l_orig_ds,r0
         jmp     @r0
+        nop
+
+! r4 = 1 write the patched values, 0 write the original values (loader table)
+        .global mode_apply
+mode_apply:
+        mov.l   l_vars0,r1
+        add     #100,r1
+        mov.l   @r1,r1              ! table (skips the title hooks)
+ma_l:   mov.l   @r1+,r2             ! address (0 = end)
+        tst     r2,r2
+        bt      ma_e
+        mov.l   @r1+,r3             ! original
+        mov.l   @r1+,r5             ! patched
+        mov.l   @r2,r6              ! current
+        tst     r4,r4
+        bt      ma_o
+        cmp/eq  r3,r6
+        bf      ma_l
+        bra     ma_l
+        mov.l   r5,@r2
+ma_o:   cmp/eq  r5,r6
+        bf      ma_l
+        bra     ma_l
+        mov.l   r3,@r2
+ma_e:   rts
         nop
 
 ! ================================================================ HUD MAX
@@ -291,7 +291,8 @@ dn_go:
 w_ylim: .word 0xCC
 w_tvoice: .word 160
 w_tx:   .word 108
-w_ty:   .word 220
+w_my1:  .word 201
+w_my2:  .word 213
 w_b8:   .word 0xB8
 w_tcol: .word 0xF0
 w_grace: .word 240
@@ -310,7 +311,11 @@ l_textcol:    .long 0x00206080
 l_white:      .long 0x00808080
 l_gold:       .long 0x00806020
 l_drawmode:   .long 0x0C1EBCC0
-l_tstr:       .long s_resur
+l_apply:      .long mode_apply
+l_s_or_on:    .long s_or_on
+l_s_or_off:   .long s_or_off
+l_s_ar_on:    .long s_ar_on
+l_s_ar_off:   .long s_ar_off
 l_hudarc:     .long hud_arcade
 l_rank_lo:    .long 0x0C30D590
 l_rank_hi:    .long 0x0C30D5D8
@@ -1456,9 +1461,9 @@ bt_tab:
         .long 0x0C30D268, t_warn, 416
         .long 0x0C30D408, t_wdate, 20
         .long 0
-t_title: .ascii "        SAIDAIOUJOU 2.0   "
-t_date:  .ascii "2026.11.5 "
-t_wdate: .ascii "           2026/11/5"
+t_title: .ascii "    SaiDaiOuJou Arrange   "
+t_date:  .ascii "2026.11.6 "
+t_wdate: .ascii "           2026/11/6"
 t_warn:
         .ascii "   THIS PROJECT IS UNOFFICIAL "
         .byte 0,0
@@ -1496,6 +1501,9 @@ s_arc_off: .asciz "  ARCADE"
 s_15_on:   .asciz "> 1.5+"
 s_15_off:  .asciz "  1.5+"
 s_blank:   .asciz " "
-s_resur:   .asciz "2.0"
+s_or_on:   .asciz "> ORIGINAL MODE"
+s_or_off:  .asciz "  ORIGINAL MODE"
+s_ar_on:   .asciz "> ARRANGE MODE"
+s_ar_off:  .asciz "  ARRANGE MODE"
         .align 2
 _end:

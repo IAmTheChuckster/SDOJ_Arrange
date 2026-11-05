@@ -107,7 +107,7 @@ def asm_link(src, base, tmp, name):
     return open(binf, 'rb').read(), syms
 
 
-def loader_source(blob_len, table, init_addr):
+def loader_source(blob_len, table, init_addr, ntitle):
     words = (blob_len + 3) // 4
     lines = [
         '        .section .text',
@@ -121,6 +121,10 @@ def loader_source(blob_len, table, init_addr):
         '        dt      r3',
         '        bf/s    cp',
         '        add     #4,r2',
+        '        mova    rtable,r0',
+        '        mov.l   l_dst,r6',
+        '        add     #100,r6',
+        '        mov.l   r0,@r6          ! v_tab for the runtime mode switch',
         '        mova    table,r0',
         '        mov     r0,r1',
         'tl:     mov.l   @r1+,r2          ! address (0 = end)',
@@ -147,7 +151,9 @@ def loader_source(blob_len, table, init_addr):
         'l_init: .long 0x%08X' % init_addr,
         'table:',
     ]
-    for addr, orig, new in table:
+    for i, (addr, orig, new) in enumerate(table):
+        if i == ntitle:
+            lines.append('rtable:')
         lines.append('        .long 0x%08X, 0x%08X, 0x%08X' % (addr, orig, new))
     lines.append('        .long 0')
     return '\n'.join(lines) + '\n'
@@ -164,7 +170,7 @@ def main():
             table.append((a, ORIG[a], syms[sym]))
     table += CONSTS
     lsrc = os.path.join(tmp, 'loader.s')
-    open(lsrc, 'w').write(loader_source(len(blob), table, syms['boot_init']))
+    open(lsrc, 'w').write(loader_source(len(blob), table, syms['boot_init'], len(HOOKS['title_hook'])))
     loader, _ = asm_link(lsrc, 0xA0000000 | ROM_LOADER, tmp, 'loader')
 
     # changes in big-endian u4 coordinates

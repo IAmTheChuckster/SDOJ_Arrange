@@ -10,10 +10,10 @@ I did all the testing and planning.
 ## Patch Notes
 
 ### Title screen
-There is no mode menu: insert a coin and press **START** to play the 2.0 patch. After the announcer says "SAIDAIOUJOU", a gold **2.0** slides in at the bottom of the title screen. Attract demos also play the 2.0 patch.
+The title screen shows two gold lines, **Original Mode** and **Arrange Mode**. Press Up or Down to move the arrow, then insert a coin and press **START**. Original Mode plays the unpatched game (the normal ship and dress select, nothing changed); Arrange Mode (the default) plays this patch.
 
 ### Boot and warning screens
-The boot screen shows **SAIDAIOUJOU 2.0 2026.11.5**, and the warning screen shows a short unofficial-project notice, **HAVE FUN!!!** and the date 2026/11/5 .
+The boot screen shows **SaiDaiOuJou Arrange 2026.11.6**, and the warning screen shows a short unofficial-project notice, **HAVE FUN!!!** and the date 2026/11/6 .
 
 ### Changes
 - **Buttons**: buttons 1 and 3 work as in the original game. **Button 2 = hyper only**: it starts a hyper when one is ready and does nothing otherwise (it never bombs). **Button 4 = bomb only**, so with a hyper ready you can bomb with button 4 and press button 2 during the bomb to go into hyper.
@@ -31,7 +31,7 @@ The boot screen shows **SAIDAIOUJOU 2.0 2026.11.5**, and the warning screen show
 ## Patching the game
 You need your own **ddpsdoj.zip** (MAME set, DoDonPachi SaiDaiOuJou 2012/4/20) containing the original u4, u2, u23 and u24 files (u4 CRC `e2a4411c`). The patcher creates:
 
-- `sdoj2_u4` - the patched program ROM (CRC `cefe1586`)
+- `sdoj2_u4` - the patched program ROM (CRC `bee48395`)
 - `ddpsdoj20.zip` - your set with u4 replaced by `sdoj2_u4`
 - `SaiDaiOuJou 2.0.mra` - the MiSTer MRA
 
