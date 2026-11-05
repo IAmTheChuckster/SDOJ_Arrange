@@ -4,7 +4,6 @@ This repository holds only source, tools and notes. No ROM data is included; you
 
 
 ## To Do
-1. Adjust the bee medals so it's **10000PTS x hit**, with the last one being **10000PTS x hit x 2** (waiting for claude)
 3. when not in hyper bullets over enemies or near proximities cancels in to small stars and cancelled bullets also cancels other bullets in close proximity.
 4. bomb and 1UP cancels bullets into big stars
 5. extra score drops 1UP icons
