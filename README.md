@@ -31,7 +31,7 @@ The boot screen shows **SAIDAIOUJOU 2.0 2026.11.5**, and the warning screen show
 ## Patching the game
 You need your own **ddpsdoj.zip** (MAME set, DoDonPachi SaiDaiOuJou 2012/4/20) containing the original u4, u2, u23 and u24 files (u4 CRC `e2a4411c`). The patcher creates:
 
-- `sdoj2_u4` - the patched program ROM (CRC `b471f291`)
+- `sdoj2_u4` - the patched program ROM (CRC `ea0b47ba`)
 - `ddpsdoj20.zip` - your set with u4 replaced by `sdoj2_u4`
 - `SaiDaiOuJou 2.0.mra` - the MiSTer MRA
 
