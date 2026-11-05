@@ -123,3 +123,5 @@ Variables at 0x0CE00000: mode (always 1 = Resurrected; title shows a gold RESURR
 - Boot date string (t_date) and warning date (t_wdate, 20 characters, leading spaces centre it).
 
 - Build 53: HIT limit back to the original 99999 (cap literal 0x0C1F6CE0, HUD digit patches and 8-slot table removed) and the Hit Bonus multiplier back to the original 20000 (max 1,999,980,000). The unsigned digit drawer and the tally hit-count cap (429,496) stay but no longer matter.
+
+- Button 2 (0x20) in trybomb_hook (1.5+): in hyper -> EndHyper 0x0C1FA250(player) (resets HYPER Lv, restores gauge) + cancel flag 0 (small stars), press swallowed; no hyper stock -> press swallowed; stock -> v_nobomb=1 and the bomb check literal 0x0C2127A0 (0x0C1F7ED0, bombgate_hook) returns 0, so it can only start a hyper. Button 4 unchanged.

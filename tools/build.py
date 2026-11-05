@@ -34,6 +34,7 @@ HOOKS = {
     'bombitem_hook': [0x0C22A508],
     'tally_hook':  [0x0C290974],
     'life_hook':   [0x0C22A8CC],
+    'bombgate_hook': [0x0C2127A0],
 }
 # original values, checked by the loader before patching (protects against other dumps)
 ORIG = {
@@ -51,6 +52,7 @@ ORIG = {
     0x0C22A508: 0x0C1F7D50,
     0x0C290974: 0x0C1F8C60,
     0x0C22A8CC: 0x0C1F7470,
+    0x0C2127A0: 0x0C1F7ED0,
 }
 
 # plain value patches (address, original, new) - no hook code

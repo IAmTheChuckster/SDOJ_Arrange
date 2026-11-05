@@ -16,7 +16,8 @@ There is no mode menu: insert a coin and press **START** to play the 2.0 patch. 
 The boot screen shows **SAIDAIOUJOU 2.0 2026.11.5**, and the warning screen shows a short unofficial-project notice, **HAVE FUN!!!** and the date 2026/11/5 .
 
 ### Changes
-- **Buttons**: buttons 1-3 work as in the original game (button 2 = bomb, or hyper when a hyper is ready). **Button 4 = bomb only**, so with a hyper ready you can bomb with button 4 and press button 2 during the bomb to go into hyper.
+- **Buttons**: buttons 1 and 3 work as in the original game. **Button 2 = hyper only**: it starts a hyper when one is ready and does nothing otherwise (it never bombs). **Button 4 = bomb only**, so with a hyper ready you can bomb with button 4 and press button 2 during the bomb to go into hyper.
+- **Ending a hyper**: press button 2 during a hyper to end it. All bullets on screen cancel into small stars and HYPER Lv goes back to 0 (no bomb is used).
 - **Expert weapon**: every dress uses the Expert shot and laser. You still pick your ship and dress, but the dress only changes the look.
 - **Bombs**: **6 bomb slots** for every dress type; you start with **3 bombs** and each death gives **+1 bomb** (up to 6).
 - **Bomb items** cancel all bullets on screen into big stars.

@@ -31,6 +31,7 @@ v_tx:       .long -1    ! x of RESURRECTED on the title (-1 = hidden)
 v_ncinit:   .long 0     ! proximity cancel: tables cleared
 v_ncframe:  .long 0     ! proximity cancel: frame counter
 v_ncprev:   .long 0     ! proximity cancel: bullets cancelled last frame (cascade seeds)
+v_nobomb:   .long 0     ! 1 = button 2 pressed: it must never bomb (offset 92)
 
         .org 0x100
 ! ---------------------------------------------------------------- game addresses
@@ -326,6 +327,10 @@ trybomb_hook:
         mov.l   l2_vars0,r1
         mov     #0,r0
         mov.l   r0,@(12,r1)         ! nohyp = 0
+        mov     r1,r2
+        add     #64,r2
+        add     #28,r2
+        mov.l   r0,@r2             ! nobomb = 0
         mov.l   @(0,r1),r0
         cmp/eq  #1,r0
         bf      tb_go
@@ -387,7 +392,7 @@ tb_btn:
         ! --- 1.5+: button 4 (0x80) = bomb only
         mov     r6,r0
         tst     #0x80,r0
-        bt      tb_go
+        bt      tb_b2
         or      #0x20,r0
         mov     r0,r6
         mov     #1,r0
@@ -396,6 +401,83 @@ tb_go:
         mov.l   l2_orig_trybomb,r0
         jmp     @r0
         nop
+        ! --- 1.5+: button 2 (0x20) = hyper only
+tb_b2:
+        tst     #0x20,r0
+        bt      tb_go
+        mov     r4,r2
+        add     #0x70,r2
+        mov.l   @r2,r2              ! player
+        tst     r2,r2
+        bt      tb_go
+        mov.w   w_tb2e0,r0
+        mov.l   @(r0,r2),r3         ! in hyper?
+        tst     r3,r3
+        bt      tb_nohy
+        ! in hyper: end it, cancel the bullets into small stars, no bomb
+        mov.l   r4,@-r15
+        mov.l   r5,@-r15
+        mov.l   r6,@-r15
+        sts.l   pr,@-r15
+        mov.l   r2,@-r15
+        mov.l   l_tb_end,r0
+        jsr     @r0                 ! EndHyper(player): HYPER Lv back to 0
+        mov     r2,r4
+        mov.l   @r15,r5             ! player
+        mov     #32,r4
+        mov     #0,r6               ! flag 0 = small stars
+        mov.l   l_tb_cancel,r0
+        jsr     @r0
+        nop
+        mov.l   @r15+,r2
+        lds.l   @r15+,pr
+        mov.l   @r15+,r6
+        mov.l   @r15+,r5
+        mov.l   @r15+,r4
+        bra     tb_drop
+        nop
+tb_nohy:
+        mov.w   w_tb2e4,r0
+        mov.l   @(r0,r2),r3         ! hyper stocks
+        tst     r3,r3
+        bt      tb_drop             ! no hyper ready: the press does nothing
+        mov.l   l2_vars0,r1         ! hyper ready: start it, but never bomb
+        add     #64,r1
+        add     #28,r1
+        mov     #1,r0
+        mov.l   r0,@r1             ! nobomb = 1
+        bra     tb_go
+        nop
+tb_drop:
+        mov     r6,r0
+        and     #0xDF,r0            ! ignore button 2 this frame
+        mov     r0,r6
+        bra     tb_go
+        nop
+        .align 2
+w_tb2e0:    .word 0x2E0
+w_tb2e4:    .word 0x2E4
+l_tb_end:    .long 0x0C1FA250
+l_tb_cancel: .long CANCEL
+
+! TryBomb's bomb check (0x0C1F7ED0): refused while button 2 is the trigger
+        .global bombgate_hook
+bombgate_hook:
+        mov.l   l_bg_vars,r1
+        add     #64,r1
+        add     #28,r1
+        mov.l   @r1,r0
+        tst     r0,r0
+        bt      bg_orig
+        rts
+        mov     #0,r0
+bg_orig:
+        mov.l   l_bg_orig,r0
+        jmp     @r0
+        nop
+        .align 2
+l_bg_vars: .long v_mode
+l_bg_orig: .long 0x0C1F7ED0
 
 ! ================================================================ ActivateHyper hook
         .global acthyp_hook
