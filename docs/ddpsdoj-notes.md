@@ -93,7 +93,8 @@ Variables at 0x0CE00000: mode (always 1 = Resurrected; title shows a gold RESURR
 
 ## HIT counter
 - Combo add 0x0C1F6C10 caps +0x1FC at 99999 (literal 0x0C1F6CE0); Resurrected raises it to 9,999,999.
-- HUD HIT number 0x0C27DA..: value copied to HUD obj +0x70, digits from divisor 10000 (mov.w 0x0C27DC24, used at 0x0C27DAF0/0x0C27DB62); patched to mov.l 1000000 for 7 digits. 0x0C27FAD0 is a separate 5-digit display with its own 99999 cap (0x0C27FBC8, left as is).
+- HUD HIT number 0x0C27DA..: value copied to HUD obj +0x70, digits from divisor 10000 (mov.w 0x0C27DC24, used at 0x0C27DAF0/0x0C27DB62); patched to mov.l 1000000 for 7 digits. Digit positions come from a 5-slot table 0x0C5B59DC (x -92..-8 step 21, y 108; literal 0x0C27DC34); Resurrected points it to an 8-slot copy.
+- HUD MAX = player +0x278, drawn by number drawer 0x0C27E880 (call literal 0x0C27ADB4). The drawer packs digits 2 px tighter above 0x0C27E990 (100,000,000); Resurrected lowers that to 99,999 for the MAX call only.
 
 ## Rank
 - Player rank +0x2F0 (HUD RANK, 0..50): +table 0x0C3387F0[hypers spent] per hyper (0,1,1,2,2,3,3,4,4,5,5), -2 per bomb (0x0C1F9FD0).

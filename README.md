@@ -39,11 +39,11 @@ The boot screen shows **SDOJ RESURRECTED 2026.10.30**, and the warning screen sh
 - **Rank up to 999**: rank no longer stops at 50 (the HUD shows 3 digits). Up to 50 it works as in the original game; above 50 enemy bullets get faster: +0.2% per rank up to rank 100 (+10%), then +0.1% per rank (200 +20%, 500 +50%, 999 +99.9%), compared with rank 50. Rank still goes up with hypers and down with bombs.
 - **Hyper ready voice**: the "HYPER SYSTEM READY" voice also plays whenever HYPER Lv goes up during a hyper.
 - **Hidden bees**: every hidden bee shows **+100%** and gives exactly **one hyper** (max 10; no combo-based meter gain). During a hyper it raises **HYPER Lv** by 1 instead (the GP bonus stays as it was). Every bee also cancels all bullets into big stars.
-- **No 99999 HIT limit**: the HIT counter goes up to 9,999,999 and the HUD shows up to 7 digits.
+- **No 99999 HIT limit**: the HIT counter goes up to 9,999,999. The big HIT number keeps its even spacing for 6-7 digits, and the HUD MAX number packs its digits slightly tighter above 99,999 so it fits next to the MAX label.
 - **Shot cancels bullets during hyper**: while a hyper is active, enemy bullets touched by your shot (not the laser) are cancelled into big stars.
 
 ## Patching the game
-You need your own `ddpsdoj.zip` (MAME set, u4 CRC `e2a4411c`). The patched u4 has CRC `68b8fb18`.
+You need your own `ddpsdoj.zip` (MAME set, u4 CRC `e2a4411c`). The patched u4 has CRC `863fd921`.
 
 The patched set is `ddpsdojdfk.zip`, with the patched u4 stored as `sdojdfk_u4`.
 ### Web patcher

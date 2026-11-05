@@ -150,6 +150,48 @@ th_draw1:                           ! draw RESURRECTED at (r4, r5)
         jmp     @r0
         nop
 
+! ================================================================ HUD MAX
+! The number drawer 0x0C27E880 packs digits 2 px tighter above its threshold
+! (100,000,000). For the HUD MAX use 99,999, so 6-7 digits stay evenly spaced
+! in the old 5-digit space. The threshold is restored after the call.
+        .global maxnum_hook
+maxnum_hook:
+        sts.l   pr,@-r15
+        mov.l   @(16,r15),r0        ! copy the 4 stack arguments
+        mov.l   r0,@-r15
+        mov.l   @(16,r15),r0
+        mov.l   r0,@-r15
+        mov.l   @(16,r15),r0
+        mov.l   r0,@-r15
+        mov.l   @(16,r15),r0
+        mov.l   r0,@-r15
+        mov.l   l_mthr,r1
+        mov.l   l_m5,r0
+        mov.l   r0,@r1
+        mov.l   l_maxorig,r0
+        jsr     @r0
+        nop
+        mov.l   l_mthr,r1
+        mov.l   l_m8,r2
+        mov.l   r2,@r1
+        add     #16,r15
+        lds.l   @r15+,pr
+        rts
+        nop
+        .align 2
+l_mthr:    .long 0x0C27E990
+l_m5:      .long 99999
+l_m8:      .long 100000000
+l_maxorig: .long 0x0C27E880
+
+! ================================================================ big HIT counter
+! Digit positions (x, y) for the big HIT number: the game's 5 slots, 21 px apart,
+! extended to 8 so 6-7 digit counts keep the same even spacing.
+        .align 2
+        .global hit_slots
+hit_slots:
+        .long -92,108, -71,108, -50,108, -29,108, -8,108, 13,108, 34,108, 55,108
+
 ! ================================================================ draw string hook
 ! Replace the rank line and the two extend lines with the mode menu.
         .global ds_hook
