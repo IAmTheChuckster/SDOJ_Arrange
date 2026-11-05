@@ -184,6 +184,27 @@ l_m5:      .long 99999
 l_m8:      .long 100000000
 l_maxorig: .long 0x0C27E880
 
+! Stage-clear Hit Bonus: the tally pays 'hits x HITBONUS_MULT'. Without a cap that
+! passes 4,294,967,295 (the most the 32-bit counters and the unsigned digit
+! drawer can hold) around 429,496 hits. Wrap the hit getter used by the tally
+! and clamp the count so the bonus stays at or under that limit.
+        .global tally_hook
+tally_hook:
+        sts.l   pr,@-r15
+        mov.l   l_tgo,r1
+        jsr     @r1
+        nop
+        mov.l   l_tcap,r1
+        cmp/hi  r1,r0
+        bf      1f
+        mov     r1,r0
+1:      lds.l   @r15+,pr
+        rts
+        nop
+        .align 2
+l_tgo:      .long 0x0C1F8C60
+l_tcap:     .long 429496
+
 ! ================================================================ big HIT counter
 ! Digit positions (x, y) for the big HIT number: the game's 5 slots, 21 px apart,
 ! extended to 8 so 6-7 digit counts keep the same even spacing.

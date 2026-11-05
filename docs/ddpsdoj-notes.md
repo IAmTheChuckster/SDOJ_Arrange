@@ -96,6 +96,11 @@ Variables at 0x0CE00000: mode (always 1 = Resurrected; title shows a gold RESURR
 - HUD HIT number 0x0C27DA..: value copied to HUD obj +0x70, digits from divisor 10000 (mov.w 0x0C27DC24, used at 0x0C27DAF0/0x0C27DB62); patched to mov.l 1000000 for 7 digits. Digit positions come from a 5-slot table 0x0C5B59DC (x -92..-8 step 21, y 108; literal 0x0C27DC34); Resurrected points it to an 8-slot copy.
 - HUD MAX = player +0x278, drawn by number drawer 0x0C27E880 (call literal 0x0C27ADB4). The drawer packs digits 2 px tighter above 0x0C27E990 (100,000,000); Resurrected lowers that to 99,999 for the MAX call only.
 
+## Stage-clear tally
+- Tally state machine 0x0C290880.. : init reads the hit count through 0x0C1F8C60 (literal 0x0C290974) into the row struct (+4 remaining, +8 counted, +12 bonus total at 0x0C7D6414..). Each frame steps `r8` hits and adds `r8 x mult` to the total and the score (0x0C1F6D00). Case 4 is the Hit Bonus: multiplier mov.w at 0x0C290D1C (20000 literal 0x0C290DE6; Resurrected points it at the 10000 word 0x0C290DEA).
+- The result number drawer 0x0C292450 divided by 10 with the signed 0x66666667 trick, so values >= 2^31 drew garbage. Resurrected makes it unsigned (dmulu.l, 0xCCCCCCCD, 3 logical shifts).
+- Resurrected caps the hit count the tally reads at 429,496 (4,294,967,295 / 10,000), via a wrapper on literal 0x0C290974.
+
 ## Rank
 - Player rank +0x2F0 (HUD RANK, 0..50): +table 0x0C3387F0[hypers spent] per hyper (0,1,1,2,2,3,3,4,4,5,5), -2 per bomb (0x0C1F9FD0).
 - 0x0C661B48 = max player rank (via 0x0C1F9F80, literal 0x0C1FDD94); HUD draws it (0x0C27EC80, literal 0x0C27EDF0, 2 digits, cap 99).

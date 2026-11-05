@@ -37,6 +37,7 @@ The boot screen shows **SDOJ RESURRECTED 2026.10.30**, and the warning screen sh
 - **Hyper ready voice**: the "HYPER SYSTEM READY" voice also plays whenever HYPER Lv goes up during a hyper.
 - **Hidden bees**: every hidden bee shows **+100%** and gives exactly **one hyper** (max 10; no combo-based meter gain). During a hyper it raises **HYPER Lv** by 1 instead (the GP bonus stays as it was). Every bee also cancels all bullets into big stars.
 - **No 99999 HIT limit**: the HIT counter goes up to 9,999,999. The big HIT number keeps its even spacing for 6-7 digits, and the HUD MAX number packs its digits slightly tighter above 99,999 so it fits next to the MAX label.
+- **Stage-clear Hit Bonus is hits x 10,000** (was x 20,000) and is drawn correctly above 2,147,483,647. It is capped at 4,294,967,295: above 429,496 hits the tally counts 429,496 hits (bonus 4,294,960,000).
 - **Shot cancels bullets during hyper**: while a hyper is active, enemy bullets touched by your shot (not the laser) are cancelled into big stars.
 
 ## Patching the game
