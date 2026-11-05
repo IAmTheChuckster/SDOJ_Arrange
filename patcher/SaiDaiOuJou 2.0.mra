@@ -52,5 +52,5 @@
         <part name="sdoj2_u4" crc="e1860114" length="0x400000"/>
     </rom>
 
-    <buttons names="Laser,Bomb/Hyper,Rapid Shot,Bomb,Start,Coin,Test,Service,Save State" default="A,B,X,Y,Start,R,L,Select"/>
+    <buttons names="Laser,Hyper,Rapid Shot,Bomb,Start,Coin,Test,Service,Save State" default="A,B,X,Y,Start,R,L,Select"/>
 </misterromdescription>
