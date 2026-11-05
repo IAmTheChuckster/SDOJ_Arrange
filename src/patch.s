@@ -858,6 +858,47 @@ bi_vars:   .long v_mode
 bi_orig:   .long 0x0C1F7D50
 bi_cancel: .long CANCEL
 
+! ================================================================ dress select screen (2.0)
+! The select screen draws its panels through five JSR literals (all 0x0C1E4990, sprite draw).
+! Everything those five call sites draw is the description box (text per dress) and the
+! dress-name / AUTO BOMB strip, except 0x13F59 (the character shadow): draw them far
+! off screen instead (the weapon icon is drawn elsewhere and stays).
+        .global dress_hook
+dress_hook:
+        sts     pr,r0
+        mov.l   dh_p0,r1
+        cmp/eq  r1,r0
+        bt      dh_hide
+        mov.l   dh_p1,r1
+        cmp/eq  r1,r0
+        bt      dh_hide
+        mov.l   dh_p2,r1
+        cmp/eq  r1,r0
+        bt      dh_hide
+        mov.l   dh_p3,r1
+        cmp/eq  r1,r0
+        bt      dh_hide
+        mov.l   dh_p4,r1
+        cmp/eq  r1,r0
+        bf      dh_go
+dh_hide:
+        mov.l   dh_keep,r0
+        cmp/eq  r0,r4
+        bt      dh_go
+        mov.l   dh_far,r5
+dh_go:  mov.l   dh_orig,r0
+        jmp     @r0
+        nop
+        .align 2
+dh_p0:   .long 0x0C274656
+dh_p1:   .long 0x0C274E02
+dh_p2:   .long 0x0C274F54
+dh_p3:   .long 0x0C2750A8
+dh_p4:   .long 0x0C2751DE
+dh_keep: .long 0x00013F59
+dh_far:  .long 0xE0000000
+dh_orig: .long 0x0C1E4990
+
 ! ================================================================ 1UP item (1.5+)
 ! 0x0C1F7470 (add a life) is called by the 1UP item pickup (literal 0x0C22A8CC): cancel bullets into big stars.
         .global life_hook
