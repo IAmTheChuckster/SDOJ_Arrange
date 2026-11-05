@@ -49,7 +49,7 @@
     <nvram index="3" size="135680"/>
 
     <rom index="0" zip="ddpsdoj20.zip" md5="none">
-        <part name="sdoj2_u4" crc="b471f291" length="0x400000"/>
+        <part name="sdoj2_u4" crc="ea0b47ba" length="0x400000"/>
     </rom>
 
     <buttons names="Laser,Hyper,Rapid Shot,Bomb,Start,Coin,Test,Service,Save State" default="A,B,X,Y,Start,R,L,Select"/>

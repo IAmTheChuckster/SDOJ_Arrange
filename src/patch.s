@@ -858,6 +858,28 @@ bi_vars:   .long v_mode
 bi_orig:   .long 0x0C1F7D50
 bi_cancel: .long CANCEL
 
+! ================================================================ always Expert (2.0)
+! Player init sets +0x10 (dress type: 0 shot, 1 laser, 2 expert) through 0x0C1F7810.
+! Forcing it here makes the whole game (stage setup, difficulty tables) see Expert from the start.
+        .global dresstype_hook
+dresstype_hook:
+        mov     #2,r5
+        mov.l   dt_orig,r0
+        jmp     @r0
+        nop
+        .align 2
+dt_orig: .long 0x0C1F7810
+
+! Auto bomb (player +0x2C, set through 0x0C1F7850 at player init): forced on for every dress.
+        .global autobomb_hook
+autobomb_hook:
+        mov     #1,r5
+        mov.l   ab_orig,r0
+        jmp     @r0
+        nop
+        .align 2
+ab_orig: .long 0x0C1F7850
+
 ! ================================================================ dress select screen (2.0)
 ! The select screen draws its panels through five JSR literals (all 0x0C1E4990, sprite draw).
 ! Everything those five call sites draw is the description box (text per dress) and the
