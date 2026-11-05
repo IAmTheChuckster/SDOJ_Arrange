@@ -1,4 +1,4 @@
-# SDOJ Fukkatsu
+# DoDonPachi SaiDaiOuJou 2.0
 A patch for `DoDonPachi SaiDaiOuJou (Japan, 2012/ 4/20)`<br>
 This repository holds only source, tools and notes. No ROM data is included; you patch your own legally owned dump
 
