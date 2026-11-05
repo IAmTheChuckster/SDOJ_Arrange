@@ -1,5 +1,5 @@
 <!--
-  ikacore_CV1k MRA - SDOJ Resurrected (2012/ 4/20).
+  ikacore_CV1k MRA - SDOJ Resurrected (2026/11/5).
   
   Rom order is deliberate - DDR3 first, index 0 LAST.  Index 0's download
   is what finally releases the CPU, so every image is in place before the
@@ -28,7 +28,7 @@
 -->
 <misterromdescription>
     <about author="ika-musume" source="https://github.com/ika-musume/ikacore_CV1k"/>
-    <name>SDOJ Resurrected (2012/ 4/20)</name>
+    <name>SDOJ Resurrected (2026/11/5)</name>
     <setname>ddpsdojdfk</setname>
     <year>2012</year>
     <manufacturer>Cave</manufacturer>
