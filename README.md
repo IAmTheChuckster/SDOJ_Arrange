@@ -4,10 +4,6 @@ This repository holds only source, tools and notes. No ROM data is included; you
 
 
 ## To Do
-<<<<<<< Updated upstream
-=======
-3. bullets over enemies or near proximities cancels in to small stars and cancelled bullets also cancels other bullets in close proximity.
->>>>>>> Stashed changes
 4. bomb and 1UP cancels bullets into big stars
 5. extra score drops 1UP icons
 6. make all dresses expert mode and expert weapon
