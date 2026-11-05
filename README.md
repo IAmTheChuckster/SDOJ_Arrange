@@ -10,7 +10,7 @@ I did all the testing and planning.
 ## Patch Notes
 
 ### Title screen
-There is no mode menu: insert a coin and press **START** to play the 2.0 patch. After the announcer says "SAIDAIOUJOU", a gold **2.0** slides in at the bottom of the title screen. Attract demos also play as Resurrected.
+There is no mode menu: insert a coin and press **START** to play the 2.0 patch. After the announcer says "SAIDAIOUJOU", a gold **2.0** slides in at the bottom of the title screen. Attract demos also play the 2.0 patch.
 
 ### Boot and warning screens
 The boot screen shows **SAIDAIOUJOU 2.0 2026.11.5**, and the warning screen shows a short unofficial-project notice, **HAVE FUN!!!** and the date 2026/11/5 .
@@ -29,22 +29,34 @@ The boot screen shows **SAIDAIOUJOU 2.0 2026.11.5**, and the warning screen show
 - **Bullets cancel near enemies**: a bullet that flies within 24 px of an enemy (any bullet emitter) turns into a small star (a **big star** during hyper), and bullets within 16 px of one cancelled the frame before cancel too, so it ripples outwards. Bullets younger than 7 frames and a bullet's own birthplace don't count.
 
 ## Patching the game
-You need your own `ddpsdoj.zip` (MAME set, u4 CRC `e2a4411c`). The patched u4 has CRC `863fd921`.
+You need your own **ddpsdoj.zip** (MAME set, DoDonPachi SaiDaiOuJou 2012/4/20) containing the original u4, u2, u23 and u24 files (u4 CRC `e2a4411c`). The patcher creates:
 
-The patched set is `ddpsdoj20.zip`, with the patched u4 stored as `sdoj2_u4`.
+- `sdoj2_u4` - the patched program ROM (CRC `54264ec9`)
+- `ddpsdoj20.zip` - your set with u4 replaced by `sdoj2_u4`
+- `SaiDaiOuJou 2.0.mra` - the MiSTer MRA
+
 ### Web patcher
+Open **https://iamthechuckster.github.io/SaiDaiOuJou_2.0/**
 
-open `patcher/index.html`, drop `ddpsdoj.zip` on it and download `ddpsdoj20.zip`, the MiSTer `SaiDaiOuJou 2.0.mra`, or `sdoj2_u4` alone. Everything runs locally in the browser.
+1. Open the web patcher.
+2. Load your `ddpsdoj.zip` (or a loose u4 file). Everything is processed in your browser and nothing is uploaded.
+3. Check that the files show as OK.
+4. Download **ddpsdoj20.zip**, **SaiDaiOuJou 2.0.mra** and **sdoj2_u4.zip** or **sdoj2_u4**.
 
-### Python patcher
+### Python script
+Needs Python 3 and no extra packages. Download `sdoj_patch.py` and `sdoj_patch_data.py` into the same folder, then run:
 
 ```
-python3 patcher/sdoj_patch.py ddpsdoj.zip patched/ddpsdoj20.zip
+python3 sdoj_patch.py ddpsdoj.zip --zip --mra
 ```
 
-Only u4 changes (written as `sdoj2_u4`); all other files are copied as they are. For MAME 0.289, which looks for `ddpsdoj.zip` with a file named `u4`, rename `sdoj2_u4` to `u4` in a copy named `ddpsdoj.zip` (MAME will warn about the changed u4 checksum - that is expected).
+`--zip` writes `ddpsdoj20.zip`, `--mra` writes `SaiDaiOuJou 2.0.mra` (it needs the .mra from this repository next to the script), and `-o FILE` sets the output path for `sdoj2_u4`. A loose u4 can be given instead of the zip (without `--zip`).
 
-Developers: `src/patch.s` is the SH-3 source; `python3 tools/build.py` (needs SH binutils such as `binutils-sh4-linux-gnu`) regenerates `patcher/sdoj_patch_data.py`; then `python3 tools/make_web.py ddpsdoj.zip` regenerates `patcher/index.html` and the .mra CRC. The patch adds a small boot loader in unused u4 space that copies the new code to free work RAM (0x0CE00000) and redirects a few code pointers in the unpacked program. Research notes are in `docs/ddpsdoj-notes.md`.
+### Using the patched files
+- **MAME 0.289**: copy your `ddpsdoj.zip`, rename `sdoj2_u4` to `u4` inside the copy, and run `mame ddpsdoj`. MAME will warn about the changed u4 checksum - that is expected.
+- **MiSTer CV1k**: copy `ddpsdoj20.zip` to `games/mame` and `SaiDaiOuJou 2.0.mra` to `_Arcade`.
+
+Developers: `src/patch.s` is the SH-3 source; `python3 tools/build.py` (needs SH binutils such as `binutils-sh4-linux-gnu`) regenerates `sdoj_patch_data.py`; then `python3 tools/make_web.py ddpsdoj.zip` regenerates `index.html`, the .mra CRC and this README's CRC. The patch adds a small boot loader in unused u4 space that copies the new code to free work RAM (0x0CE00000) and redirects a few code pointers in the unpacked program. Research notes are in `docs/ddpsdoj-notes.md`.
 
 ## Testing
 This patch was tested with MAME 0.289 and [CV1k core for the MiSTer FPGA by Raki](https://www.patreon.com/c/ikamusume/posts)<br>

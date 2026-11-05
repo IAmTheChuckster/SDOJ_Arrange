@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Developer build: assemble src/patch.s, generate the boot loader, and write
-patcher/sdoj_patch_data.py (changed u4 bytes only - no original ROM data).
+sdoj_patch_data.py (changed u4 bytes only - no original ROM data).
 
 Needs SH binutils (sh4-linux-gnu-as/ld/objcopy/nm, or sh-elf-*).
 Usage: python3 tools/build.py
@@ -9,7 +9,7 @@ import os, re, shutil, subprocess, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, 'src')
-OUT = os.path.join(ROOT, 'patcher', 'sdoj_patch_data.py')
+OUT = os.path.join(ROOT, 'sdoj_patch_data.py')
 
 RAM_BASE = 0x0CE00000          # free work RAM used for the patch code + variables
 ROM_LOADER = 0x3E0000          # free space in u4 (byte offset, big-endian view)

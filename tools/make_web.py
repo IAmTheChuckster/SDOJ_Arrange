@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Generate patcher/index.html (browser patcher) and patcher/SaiDaiOuJou 2.0.mra
-from patcher/sdoj_patch_data.py. Needs your original ddpsdoj.zip only to compute
+"""Generate index.html (browser patcher) and SaiDaiOuJou 2.0.mra
+from sdoj_patch_data.py. Needs your original ddpsdoj.zip only to compute
 the patched u4 CRC (no ROM data is written anywhere).
 
 Usage: python3 tools/make_web.py path/to/ddpsdoj.zip [build-number]
@@ -8,7 +8,7 @@ Usage: python3 tools/make_web.py path/to/ddpsdoj.zip [build-number]
 import base64, json, os, re, subprocess, sys, zipfile, zlib
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, 'patcher'))
+sys.path.insert(0, ROOT)
 from sdoj_patch_data import CHANGES  # noqa: E402
 import sdoj_patch  # noqa: E402
 
@@ -39,13 +39,13 @@ def main():
         test[off:off + len(d)] = d
     assert bytes(test) == patched, 'web patch table does not reproduce the Python patcher'
 
-    mra_path = os.path.join(ROOT, 'patcher', 'SaiDaiOuJou 2.0.mra')
+    mra_path = os.path.join(ROOT, 'SaiDaiOuJou 2.0.mra')
     mra = open(mra_path).read()
     mra = re.sub(r'(<part name="sdoj2_u4" crc=")[0-9a-fA-F]{8}', lambda m: m.group(1) + '%08x' % pcrc, mra)
     open(mra_path, 'w').write(mra)
 
     # update the published page in place (no separate template)
-    ip = os.path.join(ROOT, 'patcher', 'index.html')
+    ip = os.path.join(ROOT, 'index.html')
     html = open(ip).read()
     old_crc = re.search(r'PATCHED_CRC = 0x([0-9a-f]{8})', html).group(1)
     def sub(pat, rep, h):
@@ -59,13 +59,17 @@ def main():
     html = sub(r'const MRA = ".*?";\n', lambda m: 'const MRA = ' + json.dumps(mra) + ';\n', html)
     html = html.replace('<td class="mono">%s</td>' % old_crc, '<td class="mono">%08x</td>' % pcrc)
     html = re.sub(r'build \d+', 'build ' + build, html)
-    open(os.path.join(ROOT, 'patcher', 'index.html'), 'w').write(html)
+    open(os.path.join(ROOT, 'index.html'), 'w').write(html)
 
-    p = os.path.join(ROOT, 'patcher', 'sdoj_patch.py')
+    p = os.path.join(ROOT, 'sdoj_patch.py')
     s = open(p).read()
     s = re.sub(r'PATCHED_CRC = 0x[0-9A-Fa-f]{8}', 'PATCHED_CRC = 0x%08X' % pcrc, s)
     open(p, 'w').write(s)
-    print('patched u4 CRC %08x, build %s -> patcher/index.html, patcher/SaiDaiOuJou 2.0.mra' % (pcrc, build))
+    rp = os.path.join(ROOT, 'README.md')
+    rd = open(rp).read()
+    rd = re.sub(r'(the patched program ROM \(CRC `)[0-9a-f]{8}', lambda m: m.group(1) + '%08x' % pcrc, rd)
+    open(rp, 'w').write(rd)
+    print('patched u4 CRC %08x, build %s -> index.html, SaiDaiOuJou 2.0.mra' % (pcrc, build))
 
 
 if __name__ == '__main__':

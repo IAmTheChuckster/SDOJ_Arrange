@@ -73,7 +73,7 @@ footer { color: var(--muted); font-size: 13px; text-align: center; }
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">DoDonPachi SaiDaiOuJou · Cave CV1000-D · build 56</div>
+    <div class="eyebrow">DoDonPachi SaiDaiOuJou · Cave CV1000-D · build 57</div>
     <h1>SDOJ Resurrected Patcher</h1>
     <div class="privacy"><span class="dot"></span>Everything runs in your browser. Your ROMs are never uploaded.</div>
   </header>
@@ -275,7 +275,7 @@ footer { color: var(--muted); font-size: 13px; text-align: center; }
     const oc = crc32(out); bar(.8);
     $("outcrc").textContent = hex(oc);
     if (oc !== PATCHED_CRC) { $("outstatus").className = "pill err"; $("outstatus").textContent = "Wrong CRC"; return fail("The patched u4 came out with CRC " + hex(oc) + " instead of " + hex(PATCHED_CRC) + ", so nothing was offered for download."); }
-    $("outstatus").className = "pill ok"; $("outstatus").textContent = "Matches build 56";
+    $("outstatus").className = "pill ok"; $("outstatus").textContent = "Matches build 57";
     $("checkmsg").textContent = "Original u4 found (CRC " + hex(ORIG_CRC) + ") and patched.";
     state.patched = out; bar(1);
     $("btnU4zip").disabled = false; $("btnU4").disabled = false; $("btnMra").disabled = false;
