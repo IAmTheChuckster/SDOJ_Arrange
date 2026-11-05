@@ -101,6 +101,10 @@ Variables at 0x0CE00000: mode (always 1 = Resurrected; title shows a gold RESURR
 - The result number drawer 0x0C292450 divided by 10 with the signed 0x66666667 trick, so values >= 2^31 drew garbage. Resurrected makes it unsigned (dmulu.l, 0xCCCCCCCD, 3 logical shifts).
 - Resurrected caps the hit count the tally reads at 429,496 (4,294,967,295 / 10,000), via a wrapper on literal 0x0C290974.
 
+## Proximity cancel (Resurrected)
+- Per frame from hyplv_frame (called by trybomb_hook): walks the bullet list; flying bullets (state 2) get an age and birth point in a table at 0x0CE10000 (index (node>>4)&0x3FF, nodes are 0x130 apart). First sight of a bullet registers its birth point as an emitter (32 slots, 30 frame life). Cancel = the body of 0x0C1FE220 (0x0C1E6A40 release, state 3, flag 0 = small stars, player at +0xA8 of the node+124).
+- Hyper active = player +0x2E0 non-zero (no cancelling then). Gotcha: the assembler emits 4-byte SH2A forms for mov.l displacements over 60; keep them <= 60.
+
 ## Rank
 - Player rank +0x2F0 (HUD RANK, 0..50): +table 0x0C3387F0[hypers spent] per hyper (0,1,1,2,2,3,3,4,4,5,5), -2 per bomb (0x0C1F9FD0).
 - 0x0C661B48 = max player rank (via 0x0C1F9F80, literal 0x0C1FDD94); HUD draws it (0x0C27EC80, literal 0x0C27EDF0, 2 digits, cap 99).

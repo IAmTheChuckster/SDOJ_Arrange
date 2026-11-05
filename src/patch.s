@@ -28,6 +28,9 @@ v_lastlv:   .long 0     ! HYPER Lv seen last frame (voice)
 v_tlast:    .long 0     ! frame counter at the last title frame
 v_tstart:   .long 0     ! frame counter when the title started
 v_tx:       .long -1    ! x of RESURRECTED on the title (-1 = hidden)
+v_ncinit:   .long 0     ! proximity cancel: tables cleared
+v_ncframe:  .long 0     ! proximity cancel: frame counter
+v_ncprev:   .long 0     ! proximity cancel: bullets cancelled last frame (cascade seeds)
 
         .org 0x100
 ! ---------------------------------------------------------------- game addresses
@@ -980,6 +983,348 @@ bi_vars:   .long v_mode
 bi_orig:   .long 0x0C1F7D50
 bi_cancel: .long CANCEL
 
+
+! ================================================================ proximity cancel
+! Every frame (r4 = player): bullets that fly within 24 px of an enemy (any bullet
+! emitter) turn into small stars, unless the player is in hyper. Bullets within 16 px
+! of a bullet cancelled the frame before cancel too, so it ripples outwards.
+! Emitters are the places bullets spawn at; they are remembered for 30 frames. A
+! bullet never counts its own birthplace as an enemy, and bullets younger than 7
+! frames are left alone.
+! Work tables at NC (cleared on the first call):
+!   +0x0000  1024 x 16: per bullet {age, spawn x, spawn y, -}   index = (addr >> 4) & 0x3FF
+!   +0x4000  32 x 16:   emitters {x, y, last frame, -}
+!   +0x4200  64 x 8:    cancelled last frame {x, y}
+!   +0x4400  64 x 8:    cancelled this frame {x, y}
+        .equ NC,        0x0CE10000
+        .equ NC_EMIT,   0x4000
+        .equ NC_PREV,   0x4200
+        .equ NC_NEW,    0x4400
+        .equ NC_SIZE,   0x4600
+        .equ R24,       0x00180000
+        .equ R16,       0x00100000
+        .equ R8,        0x00080000
+        .global nc_frame
+nc_frame:
+        sts.l   pr,@-r15
+        mov.l   r8,@-r15
+        mov.l   r9,@-r15
+        mov.l   r10,@-r15
+        mov.l   r11,@-r15
+        mov.l   r12,@-r15
+        mov.l   r13,@-r15
+        mov.l   r14,@-r15
+        mov     r4,r8                   ! player
+        mov.l   nc_c_base,r14
+        mov.l   nc_c_vars,r1
+        add     #64,r1                  ! r1 = vars + 64 (displacements stay <= 60)
+        mov.l   @(16,r1),r0             ! v_ncinit
+        tst     r0,r0
+        bf      nc_inited
+        mov     #1,r0
+        mov.l   r0,@(16,r1)
+        mov     #100,r0
+        mov.l   r0,@(20,r1)             ! frame counter starts at 100 (entry time 0 = empty)
+        mov     #0,r0
+        mov.l   r0,@(24,r1)
+        mov     r14,r2                  ! clear the tables
+        mov.w   nc_c_words,r3
+nc_clr: mov.l   r0,@r2
+        dt      r3
+        bf/s    nc_clr
+        add     #4,r2
+nc_inited:
+        mov.l   nc_c_vars,r1
+        add     #64,r1
+        mov.l   @(20,r1),r13
+        add     #1,r13
+        mov.l   r13,@(20,r1)            ! r13 = frame
+        mov.w   nc_c_2e0,r0
+        mov.l   @(r0,r8),r0             ! hyper active?
+        tst     r0,r0
+        movt    r11                     ! r11 = 1 when cancelling is allowed
+        mov     #0,r10                  ! bullets cancelled this frame
+        mov.l   nc_c_mgr,r0
+        mov.l   @r0,r1
+        tst     r1,r1
+        bt      nc_fin
+        mov.l   nc_c_30dfc,r2
+        add     r2,r1
+        mov.l   @(28,r1),r0
+        tst     r0,r0
+        bt      nc_fin
+        mov.l   @(20,r1),r9             ! first bullet
+nc_loop:
+        tst     r9,r9
+        bt      nc_fin
+        mov     r9,r0                   ! record = NC + ((node >> 4) & 0x3FF) * 16
+        shlr2   r0
+        shlr2   r0
+        mov.w   nc_c_3ff,r1
+        and     r1,r0
+        shll2   r0
+        shll2   r0
+        mov     r14,r12
+        add     r0,r12
+        mov.l   @r9,r0                  ! state
+        cmp/eq  #2,r0
+        bt      nc_fly
+        mov     #0,r0                   ! not flying: forget the bullet
+        bra     nc_next
+        mov.l   r0,@r12
+nc_fly:
+        mov.l   @(44,r9),r2             ! x
+        mov.l   @(48,r9),r3             ! y
+        mov.l   @r12,r0                 ! age
+        tst     r0,r0
+        bf      nc_old
+        mov.l   r2,@(4,r12)             ! born: remember the birthplace
+        mov.l   r3,@(8,r12)
+        mov     #1,r0
+        mov.l   r0,@r12
+        bsr     nc_reg                  ! and note the emitter
+        nop
+        bra     nc_next
+        nop
+nc_old:
+        add     #1,r0
+        mov     #100,r1
+        cmp/gt  r1,r0
+        bf      nc_agok
+        mov     r1,r0
+nc_agok:
+        mov.l   r0,@r12
+        tst     r11,r11
+        bt      nc_next                 ! in hyper
+        mov     #7,r1
+        cmp/ge  r1,r0
+        bf      nc_next                 ! too young
+        mov.l   nc_c_r24,r6
+        ! --- enemies (emitters seen in the last 30 frames)
+        mov.w   nc_c_emit,r0
+        mov     r14,r4
+        add     r0,r4
+        mov     #32,r7
+nc_e1:  mov.l   @(8,r4),r0              ! last frame seen
+        tst     r0,r0
+        bt      nc_e9
+        mov     r13,r1
+        sub     r0,r1
+        mov     #30,r0
+        cmp/hi  r0,r1
+        bt      nc_e9                   ! too old
+        mov.l   @r4,r0                  ! ex
+        mov     r2,r1
+        sub     r0,r1
+        cmp/pz  r1
+        bt      1f
+        neg     r1,r1
+1:      cmp/ge  r6,r1
+        bt      nc_e9
+        mov.l   @(4,r4),r5              ! ey
+        mov     r3,r1
+        sub     r5,r1
+        cmp/pz  r1
+        bt      2f
+        neg     r1,r1
+2:      cmp/ge  r6,r1
+        bt      nc_e9
+        mov.l   @(4,r12),r1             ! was this bullet born at this enemy?
+        sub     r0,r1
+        cmp/pz  r1
+        bt      3f
+        neg     r1,r1
+3:      cmp/ge  r6,r1
+        bt      nc_hit                  ! born elsewhere in x: it is a visitor
+        mov.l   @(8,r12),r1
+        sub     r5,r1
+        cmp/pz  r1
+        bt      4f
+        neg     r1,r1
+4:      cmp/ge  r6,r1
+        bt      nc_hit                  ! born elsewhere in y
+nc_e9:  dt      r7
+        bf/s    nc_e1
+        add     #16,r4
+        ! --- bullets cancelled last frame (cascade)
+        mov.l   nc_c_vars,r1
+        add     #64,r1
+        mov.l   @(24,r1),r7
+        tst     r7,r7
+        bt      nc_next
+        mov.w   nc_c_prev,r0
+        mov     r14,r4
+        add     r0,r4
+        mov.l   nc_c_r16,r6
+nc_p1:  mov.l   @r4,r0
+        mov     r2,r1
+        sub     r0,r1
+        cmp/pz  r1
+        bt      5f
+        neg     r1,r1
+5:      cmp/ge  r6,r1
+        bt      nc_p9
+        mov.l   @(4,r4),r0
+        mov     r3,r1
+        sub     r0,r1
+        cmp/pz  r1
+        bt      6f
+        neg     r1,r1
+6:      cmp/ge  r6,r1
+        bf      nc_hit
+nc_p9:  dt      r7
+        bf/s    nc_p1
+        add     #8,r4
+        bra     nc_next
+        nop
+nc_hit:
+        bsr     nc_cancel               ! r9 bullet, r8 player
+        nop
+        mov     #64,r0
+        cmp/ge  r0,r10
+        bt      nc_next
+        mov.w   nc_c_new,r0             ! remember where it was
+        mov     r14,r4
+        add     r0,r4
+        mov     r10,r0
+        shll2   r0
+        shll    r0
+        add     r0,r4
+        mov.l   @(44,r9),r0
+        mov.l   r0,@r4
+        mov.l   @(48,r9),r0
+        mov.l   r0,@(4,r4)
+        add     #1,r10
+nc_next:
+        bra     nc_loop
+        mov.l   @(4,r9),r9
+nc_fin:                                 ! this frame's cancels become the next frame's seeds
+        mov.l   nc_c_vars,r1
+        add     #64,r1
+        mov.l   r10,@(24,r1)
+        mov.w   nc_c_new,r0
+        mov     r14,r4
+        add     r0,r4
+        mov.w   nc_c_prev,r0
+        mov     r14,r5
+        add     r0,r5
+        mov     r10,r7
+        tst     r7,r7
+        bt      nc_ret
+nc_cp:  mov.l   @r4+,r0
+        mov.l   r0,@r5
+        mov.l   @r4+,r0
+        mov.l   r0,@(4,r5)
+        dt      r7
+        bf/s    nc_cp
+        add     #8,r5
+nc_ret: mov.l   @r15+,r14
+        mov.l   @r15+,r13
+        mov.l   @r15+,r12
+        mov.l   @r15+,r11
+        mov.l   @r15+,r10
+        mov.l   @r15+,r9
+        mov.l   @r15+,r8
+        lds.l   @r15+,pr
+        rts
+        nop
+        .align 1
+nc_c_words: .word NC_SIZE / 4
+nc_c_2e0:   .word 0x2E0
+nc_c_3ff:   .word 0x3FF
+nc_c_emit:  .word NC_EMIT
+nc_c_prev:  .word NC_PREV
+nc_c_new:   .word NC_NEW
+        .align 2
+nc_c_base:  .long NC
+nc_c_vars:  .long v_mode
+nc_c_mgr:   .long 0x0C4C8978
+nc_c_30dfc: .long 0x30DFC
+nc_c_r24:   .long R24
+nc_c_r16:   .long R16
+
+! cancel one flying bullet into small stars - the body of the game's cancel routine
+! (0x0C1FE220). r9 = bullet, r8 = player.
+nc_cancel:
+        sts.l   pr,@-r15
+        mov     r9,r7
+        add     #124,r7
+        mov.l   nc_k_rel,r0
+        jsr     @r0
+        mov.l   @(48,r7),r4
+        mov     r9,r7
+        add     #124,r7
+        mov     r9,r3
+        add     #64,r3
+        mov.l   @(36,r9),r2
+        mov     #1,r1
+        mov     #3,r4
+        mov     #0,r5
+        mov.l   r5,@(48,r7)
+        mov.l   r4,@r9
+        mov.l   r2,@(32,r9)
+        mov.l   r5,@(24,r9)
+        mov.l   r5,@(16,r3)             ! 0 = small stars
+        mov.l   r1,@(8,r3)
+        mov.l   r1,@(12,r3)
+        mov.l   r8,@(44,r7)
+        lds.l   @r15+,pr
+        rts
+        nop
+        .align 2
+nc_k_rel:   .long 0x0C1E6A40
+
+! note an emitter at (r2, r3): refresh the one within 8 px, else replace the oldest
+nc_reg:
+        mov.w   nc_r_emit,r0
+        mov     r14,r4
+        add     r0,r4
+        mov     r4,r5                   ! oldest slot
+        mov     #-1,r6
+        shlr    r6                      ! oldest time = 0x7FFFFFFF
+        mov     #32,r7
+        mov.l   nc_r_r8,r1
+        mov.l   r1,@-r15
+nr_lp:  mov.l   @(8,r4),r0
+        cmp/hi  r0,r6
+        bf      nr_nold
+        mov     r0,r6
+        mov     r4,r5
+nr_nold:
+        tst     r0,r0
+        bt      nr_nx                   ! empty slot
+        mov.l   @r15,r1
+        mov.l   @r4,r0
+        sub     r2,r0
+        cmp/pz  r0
+        bt      1f
+        neg     r0,r0
+1:      cmp/ge  r1,r0
+        bt      nr_nx
+        mov.l   @(4,r4),r0
+        sub     r3,r0
+        cmp/pz  r0
+        bt      2f
+        neg     r0,r0
+2:      cmp/ge  r1,r0
+        bt      nr_nx
+        mov     r4,r5                   ! same place: refresh this one
+        bra     nr_set
+        nop
+nr_nx:  dt      r7
+        bf/s    nr_lp
+        add     #16,r4
+nr_set: add     #4,r15
+        mov.l   r2,@r5
+        mov.l   r3,@(4,r5)
+        rts
+        mov.l   r13,@(8,r5)
+        .align 1
+nr_pad: .word 0
+nc_r_emit:  .word NC_EMIT
+        .align 2
+nc_r_r8:    .long R8
+
 ! ================================================================ 1.5+ per-frame extras
 ! r4 = player. Plays the hyper-ready voice when HYPER Lv (+0x2E8) goes up and
 ! switches the HUD rank to 3 digits.
@@ -988,6 +1333,9 @@ hyplv_frame:
         sts.l   pr,@-r15
         mov.l   r8,@-r15
         mov     r4,r8
+        mov.l   x_ncframe,r0        ! bullets near enemies cancel into stars (not in hyper)
+        jsr     @r0
+        nop
         mov.l   x_hudcode,r1        ! HUD rank: 3 digits, no cap at 99
         mov.l   x_hud3,r0
         mov.l   r0,@r1
@@ -1127,6 +1475,7 @@ x_2e0:  .word 0x2E0
 x_1000: .word 1000
         .align 2
 x_vars:    .long v_mode
+x_ncframe: .long nc_frame
 x_hudcode: .long 0x0C27ECD4
 x_hud3:    .long 0x0009E703     ! nop / mov #3,r7
 x_hud2:    .long 0xEA63E702     ! mov #99,r10 / mov #2,r7 (original)
