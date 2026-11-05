@@ -5,9 +5,9 @@ Usage:
     python3 sdoj_patch.py ddpsdoj.zip [--zip] [--mra] [-o FILE]
 
 Reads your own ddpsdoj (DoDonPachi SaiDaiOuJou) ROM set (or a loose u4 file) and
-writes the patched program ROM sdoj2_u4 (or -o FILE).
-  --zip   also write ddpsdoj20.zip: your set with u4 replaced by sdoj2_u4
-  --mra   also write "SaiDaiOuJou 2.0.mra" (MiSTer), with the patched CRC
+writes the patched program ROM arr_u4 (or -o FILE).
+  --zip   also write ddpsdojarr.zip: your set with u4 replaced by arr_u4
+  --mra   also write "DoDonPachi_SaiDaiOuJou_Arrange.mra" (MiSTer), with the patched CRC
 The original files are not modified.
 """
 import os, re, sys, zipfile, zlib
@@ -17,7 +17,7 @@ from sdoj_patch_data import CHANGES, ORIG_BOOT_LITERAL
 
 U4_SIZE = 4194560
 U4_CRC = 0xE2A4411C  # original ddpsdoj u4
-OUT_U4 = 'sdoj2_u4'
+OUT_U4 = 'arr_u4'
 PATCHED_CRC = 0xBEE48395  # set by tools/make_web.py
 
 
@@ -80,18 +80,18 @@ def main():
     if want_zip:
         if zin is None:
             sys.exit('--zip needs the ddpsdoj.zip set as input, not a loose u4')
-        with zipfile.ZipFile('ddpsdoj20.zip', 'w', zipfile.ZIP_DEFLATED) as zout:
+        with zipfile.ZipFile('ddpsdojarr.zip', 'w', zipfile.ZIP_DEFLATED) as zout:
             for n in names:
                 if n == u4name:
                     zout.writestr(os.path.join(os.path.dirname(n), OUT_U4), new)
                 else:
                     zout.writestr(n, zin.read(n))
-        print('wrote ddpsdoj20.zip')
+        print('wrote ddpsdojarr.zip')
     if want_mra:
-        mra = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'SaiDaiOuJou 2.0.mra')).read()
-        mra = re.sub(r'(<part name="sdoj2_u4" crc=")[0-9a-fA-F]{8}', lambda m: m.group(1) + '%08x' % nc, mra)
-        open('SaiDaiOuJou 2.0.mra', 'w').write(mra)
-        print('wrote SaiDaiOuJou 2.0.mra')
+        mra = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'DoDonPachi_SaiDaiOuJou_Arrange.mra')).read()
+        mra = re.sub(r'(<part name="arr_u4" crc=")[0-9a-fA-F]{8}', lambda m: m.group(1) + '%08x' % nc, mra)
+        open('DoDonPachi_SaiDaiOuJou_Arrange.mra', 'w').write(mra)
+        print('wrote DoDonPachi_SaiDaiOuJou_Arrange.mra')
 
 
 if __name__ == '__main__':
