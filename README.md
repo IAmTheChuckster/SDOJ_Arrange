@@ -36,9 +36,7 @@ You need your own **ddpsdoj.zip** (MAME set, DoDonPachi SaiDaiOuJou 2012/4/20) c
 - `SaiDaiOuJou 2.0.mra` - the MiSTer MRA
 
 ### Web patcher
-Open **https://iamthechuckster.github.io/SaiDaiOuJou_2.0/**
-
-1. Open the web patcher.
+1. Open the [web patcher](https://iamthechuckster.github.io/SaiDaiOuJou_2.0/).
 2. Load your `ddpsdoj.zip` (or a loose u4 file). Everything is processed in your browser and nothing is uploaded.
 3. Check that the files show as OK.
 4. Download **ddpsdoj20.zip**, **SaiDaiOuJou 2.0.mra** and **sdoj2_u4.zip** or **sdoj2_u4**.
