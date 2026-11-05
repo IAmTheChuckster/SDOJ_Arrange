@@ -1,4 +1,4 @@
-# SDOJ Resurrected
+# SDOJ Fukkatsu
 A patch for `DoDonPachi SaiDaiOuJou (Japan, 2012/ 4/20)`<br>
 This repository holds only source, tools and notes. No ROM data is included; you patch your own legally owned dump
 
@@ -15,7 +15,7 @@ There is no mode menu: insert a coin and press **START** to play Resurrected. Af
 ### Boot and warning screens
 The boot screen shows **SDOJ RESURRECTED 2026.11.5**, and the warning screen shows a short unofficial-project notice, **HAVE FUN!!!** and the date 2026/11/5 .
 
-### Resurrected mode
+### Changes
 - **Buttons**: buttons 1-3 work as in the original game (button 2 = bomb, or hyper when a hyper is ready). **Button 4 = bomb only**, so with a hyper ready you can bomb with button 4 and press button 2 during the bomb to go into hyper.
 - **Expert weapon**: every dress uses the Expert shot and laser. You still pick your ship and dress, but the dress only changes the look.
 - **Bombs**: **6 bomb slots** for every dress type; you start with **3 bombs** and each death gives **+1 bomb** (up to 6).
