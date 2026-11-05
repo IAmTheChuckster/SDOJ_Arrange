@@ -4,13 +4,10 @@ This repository holds only source, tools and notes. No ROM data is included; you
 
 
 ## To Do
-3. when not in hyper bullets over enemies or near proximities cancels in to small stars and cancelled bullets also cancels other bullets in close proximity.
 4. bomb and 1UP cancels bullets into big stars
 5. extra score drops 1UP icons
 6. make all dresses expert mode and expert weapon
 8. Add boss timers
-9. add revenge bullets in hyper
-10. feed it the 360 arrange mode and import the enemy healthbars
 11. Add `Inbachi OK` or `Hibachi OK` labels depending as long as the requirements are met and the numbers of bees collected if can fit
    
 ## About this project
