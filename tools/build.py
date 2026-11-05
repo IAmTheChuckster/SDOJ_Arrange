@@ -73,6 +73,14 @@ ORIG = {
     0x0C2196A0: 0x0C2196B0,
 }
 
+# plain value patches (address, original, new) - no hook code
+CONSTS = [
+    (0x0C1F6CE0, 0x0001869F, 9999999),     # HIT (combo) cap 99999 -> 9,999,999
+    (0x0C27DC24, 0x27100009, 1000000),     # HIT HUD: first divisor 10000 -> 1000000 (7 digits)
+    (0x0C27DAF0, 0x9A984D11, 0xDA4C4D11),  #   mov.w -> mov.l for that divisor
+    (0x0C27DB60, 0x5C1B9A5F, 0x5C1BDA30),  #   same, second path
+]
+
 
 def tool(name):
     for pre in ('sh4-linux-gnu-', 'sh-elf-', 'sh-linux-gnu-'):
@@ -155,6 +163,7 @@ def main():
     for sym, addrs in HOOKS.items():
         for a in addrs:
             table.append((a, ORIG[a], syms[sym]))
+    table += CONSTS
     lsrc = os.path.join(tmp, 'loader.s')
     open(lsrc, 'w').write(loader_source(len(blob), table, syms['boot_init']))
     loader, _ = asm_link(lsrc, 0xA0000000 | ROM_LOADER, tmp, 'loader')

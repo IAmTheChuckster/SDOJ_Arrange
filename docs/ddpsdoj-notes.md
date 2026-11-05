@@ -91,6 +91,10 @@ Variables at 0x0CE00000: mode (always 1 = Resurrected; title shows a gold RESURR
 - Hyper GP/HYPER Lv: +0x2E8 is the HUD HYPER Lv (level-ups during hyper via 0x0C1FA490); GP in Resurrected uses +0x2EC + +0x2E8.
 - Chain x GP is computed in 32 bits (0x0C1F6ECC, 0x0C1F706E): it overflows above 2^31 / percent (original game; left as is).
 
+## HIT counter
+- Combo add 0x0C1F6C10 caps +0x1FC at 99999 (literal 0x0C1F6CE0); Resurrected raises it to 9,999,999.
+- HUD HIT number 0x0C27DA..: value copied to HUD obj +0x70, digits from divisor 10000 (mov.w 0x0C27DC24, used at 0x0C27DAF0/0x0C27DB62); patched to mov.l 1000000 for 7 digits. 0x0C27FAD0 is a separate 5-digit display with its own 99999 cap (0x0C27FBC8, left as is).
+
 ## Rank
 - Player rank +0x2F0 (HUD RANK, 0..50): +table 0x0C3387F0[hypers spent] per hyper (0,1,1,2,2,3,3,4,4,5,5), -2 per bomb (0x0C1F9FD0).
 - 0x0C661B48 = max player rank (via 0x0C1F9F80, literal 0x0C1FDD94); HUD draws it (0x0C27EC80, literal 0x0C27EDF0, 2 digits, cap 99).
