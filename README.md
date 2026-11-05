@@ -34,7 +34,7 @@ You need your own `ddpsdoj.zip` (MAME set, u4 CRC `e2a4411c`). The patched u4 ha
 The patched set is `ddpsdoj20.zip`, with the patched u4 stored as `sdoj2_u4`.
 ### Web patcher
 
-open `patcher/index.html` (or the GitHub Pages copy), drop `ddpsdoj.zip` on it and download `ddpsdoj20.zip`, the MiSTer `SaiDaiOuJou 2.0.mra`, or `sdoj2_u4` alone. Everything runs locally in the browser.
+open `patcher/index.html`, drop `ddpsdoj.zip` on it and download `ddpsdoj20.zip`, the MiSTer `SaiDaiOuJou 2.0.mra`, or `sdoj2_u4` alone. Everything runs locally in the browser.
 
 ### Python patcher
 
