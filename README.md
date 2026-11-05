@@ -2,14 +2,6 @@
 A patch for `DoDonPachi SaiDaiOuJou (Japan, 2012/ 4/20)`<br>
 This repository holds only source, tools and notes. No ROM data is included; you patch your own legally owned dump
 
-
-## To Do
-4. bomb and 1UP cancels bullets into big stars
-5. extra score drops 1UP icons
-6. make all dresses expert mode and expert weapon
-8. Add boss timers
-11. Add `Inbachi OK` or `Hibachi OK` labels depending as long as the requirements are met and the numbers of bees collected if can fit
-   
 ## About this project
 Why did I make this? Because it's fun and for my own personal research to see the capabilities of Claude.<br> 
 While Claude was used I put effort in making sure there are balanced gameplay.<br> 
