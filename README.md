@@ -31,7 +31,7 @@ The boot screen shows **SaiDaiOuJou Arrange 2026.11.6**, and the warning screen 
 ## Patching the game
 You need your own **ddpsdoj.zip** (MAME set, DoDonPachi SaiDaiOuJou 2012/4/20) containing the original u4, u2, u23 and u24 files (u4 CRC `e2a4411c`). The patcher creates:
 
-- `arr_u4` - the patched program ROM (CRC `2bf6f5e8`)
+- `arr_u4` - the patched program ROM (CRC `41b6f659`)
 - `ddpsdojarr.zip` - your set with u4 replaced by `arr_u4`
 - `DoDonPachi SaiDaiOuJou Arrange.mra` - the MiSTer MRA
 

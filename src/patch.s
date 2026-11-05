@@ -613,7 +613,7 @@ l2_rankadd:      .long 0x0C3387F0   ! rank added per hyper level
 l2_hyplvframe:   .long hyplv_frame
 
 ! ================================================================ gauge event hook
-! p r4, amount r5, type r6.  1.5+: gauge fills 3x outside hyper; during hyper nothing
+! p r4, amount r5, type r6.  Gauge fills at the original rate (x1) outside hyper; during hyper nothing
 ! fills it (only bees raise HYPER Lv).
 ! During a bee pickup in 1.5+ the bee's own combo-based gauge gain is skipped.
         .global kill_hook
@@ -632,10 +632,7 @@ kh_nobee:
         mov.l   @(r0,r4),r0         ! hyper active?
         tst     r0,r0
         bf      kh_inhyper          ! in hyper
-        mov     r5,r0               ! not in hyper: amount * 3
-        add     r5,r5
-        add     r0,r5
-kh_orig:
+kh_orig:                            ! not in hyper: original amount (x1)
         mov.l   l3_orig_kill,r0
         jmp     @r0
         nop
