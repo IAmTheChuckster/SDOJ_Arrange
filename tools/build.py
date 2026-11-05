@@ -70,6 +70,14 @@ CONSTS = [
     (0x0C292498, 0x48214821, 0x48014801),  #   shar,shar -> shlr,shlr
     (0x0C29249C, 0x4A003AAA, 0x4801EA00),  #   shll,subc -> shlr, mov #0,r10
     (0x0C292524, 0x66666667, 0xCCCCCCCD),  #   divide-by-10 magic, unsigned
+    # dress select weapon icon: two animation tables (ship*3 + dress, pairs of words).
+    # Every dress gets the Expert row, so all three show the Expert icon.
+    (0x0C5B2790, 0x000000F1, 0x00000131), (0x0C5B2794, 0x00000101, 0x00000141),   # A: ship 0 laser
+    (0x0C5B27A8, 0x00000171, 0x000001B1), (0x0C5B27AC, 0x00000181, 0x000001C1),   # A: ship 1 laser
+    (0x0C5B27C0, 0x000001F1, 0x00000231), (0x0C5B27C4, 0x00000201, 0x00000241),   # A: ship 2 laser
+    (0x0C5B27D0, 0x000000D1, 0x00000111), (0x0C5B27D4, 0x000000E1, 0x00000121),   # B: ship 0 shot
+    (0x0C5B27E8, 0x00000151, 0x00000191), (0x0C5B27EC, 0x00000161, 0x000001A1),   # B: ship 1 shot
+    (0x0C5B2800, 0x000001D1, 0x00000211), (0x0C5B2804, 0x000001E1, 0x00000221),   # B: ship 2 shot
 ]
 
 
