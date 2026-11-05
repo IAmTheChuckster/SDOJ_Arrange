@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate patcher/index.html (browser patcher) and patcher/SDOJ Resurrected.mra
+"""Generate patcher/index.html (browser patcher) and patcher/SaiDaiOuJou 2.0.mra
 from patcher/sdoj_patch_data.py. Needs your original ddpsdoj.zip only to compute
 the patched u4 CRC (no ROM data is written anywhere).
 
@@ -39,9 +39,9 @@ def main():
         test[off:off + len(d)] = d
     assert bytes(test) == patched, 'web patch table does not reproduce the Python patcher'
 
-    mra_path = os.path.join(ROOT, 'patcher', 'SDOJ Resurrected.mra')
+    mra_path = os.path.join(ROOT, 'patcher', 'SaiDaiOuJou 2.0.mra')
     mra = open(mra_path).read()
-    mra = re.sub(r'(<part name="sdojdfk_u4" crc=")[0-9a-fA-F]{8}', lambda m: m.group(1) + '%08x' % pcrc, mra)
+    mra = re.sub(r'(<part name="sdoj2_u4" crc=")[0-9a-fA-F]{8}', lambda m: m.group(1) + '%08x' % pcrc, mra)
     open(mra_path, 'w').write(mra)
 
     # update the published page in place (no separate template)
@@ -65,7 +65,7 @@ def main():
     s = open(p).read()
     s = re.sub(r'PATCHED_CRC = 0x[0-9A-Fa-f]{8}', 'PATCHED_CRC = 0x%08X' % pcrc, s)
     open(p, 'w').write(s)
-    print('patched u4 CRC %08x, build %s -> patcher/index.html, patcher/SDOJ Resurrected.mra' % (pcrc, build))
+    print('patched u4 CRC %08x, build %s -> patcher/index.html, patcher/SaiDaiOuJou 2.0.mra' % (pcrc, build))
 
 
 if __name__ == '__main__':

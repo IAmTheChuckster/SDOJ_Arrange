@@ -2,11 +2,11 @@
 """SDOJ Resurrected patcher (Python 3, standard library only).
 
 Usage:
-    python3 sdoj_patch.py ddpsdoj.zip [ddpsdojdfk.zip]
+    python3 sdoj_patch.py ddpsdoj.zip [ddpsdoj20.zip]
 
 Reads your own ddpsdoj (DoDonPachi SaiDaiOuJou) ROM set, patches the program
-ROM u4 and writes ddpsdojdfk.zip (default: patched/ddpsdojdfk.zip) with the
-patched u4 stored as sdojdfk_u4. All other files are copied unchanged. The original ROM is not modified.
+ROM u4 and writes ddpsdoj20.zip (default: patched/ddpsdoj20.zip) with the
+patched u4 stored as sdoj2_u4. All other files are copied unchanged. The original ROM is not modified.
 """
 import os, sys, zipfile, zlib
 
@@ -15,7 +15,7 @@ from sdoj_patch_data import CHANGES, ORIG_BOOT_LITERAL
 
 U4_SIZE = 4194560
 U4_CRC = 0xE2A4411C  # original ddpsdoj u4
-OUT_U4 = 'sdojdfk_u4'
+OUT_U4 = 'sdoj2_u4'
 PATCHED_CRC = 0xE1860114  # set by tools/make_web.py
 
 
@@ -43,7 +43,7 @@ def main():
     if len(sys.argv) < 2:
         sys.exit(__doc__)
     src = sys.argv[1]
-    dst = sys.argv[2] if len(sys.argv) > 2 else os.path.join('patched', 'ddpsdojdfk.zip')
+    dst = sys.argv[2] if len(sys.argv) > 2 else os.path.join('patched', 'ddpsdoj20.zip')
     with zipfile.ZipFile(src) as zin:
         names = zin.namelist()
         u4name = next((n for n in names if os.path.basename(n).lower() == 'u4'), None)
