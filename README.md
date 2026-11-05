@@ -4,6 +4,10 @@ This repository holds only source, tools and notes. No ROM data is included; you
 
 
 ## To Do
+<<<<<<< Updated upstream
+=======
+3. bullets over enemies or near proximities cancels in to small stars and cancelled bullets also cancels other bullets in close proximity.
+>>>>>>> Stashed changes
 4. bomb and 1UP cancels bullets into big stars
 5. extra score drops 1UP icons
 6. make all dresses expert mode and expert weapon
@@ -21,22 +25,21 @@ I did all the testing and planning.
 There is no mode menu: insert a coin and press **START** to play Resurrected. After the announcer says "SAIDAIOUJOU", a gold **RESURRECTED** slides in at the bottom of the title screen. Attract demos also play as Resurrected.
 
 ### Boot and warning screens
-The boot screen shows **SDOJ RESURRECTED 2026.10.30**, and the warning screen shows a short unofficial-project notice, **HAVE FUN!!!** and the date 2026/10/30 .
+The boot screen shows **SDOJ RESURRECTED 2026.11.5**, and the warning screen shows a short unofficial-project notice, **HAVE FUN!!!** and the date 2026/11/5 .
 
 ### Resurrected mode
 - **Buttons**: buttons 1-3 work as in the original game (button 2 = bomb, or hyper when a hyper is ready). **Button 4 = bomb only**, so with a hyper ready you can bomb with button 4 and press button 2 during the bomb to go into hyper.
 - **Expert weapon**: every dress uses the Expert shot and laser. You still pick your ship and dress, but the dress only changes the look.
 - **Bombs**: **6 bomb slots** for every dress type; you start with **3 bombs** and each death gives **+1 bomb** (up to 6).
 - **Bomb items** cancel all bullets on screen into big stars.
-- **Hyper meter** fills **3 times as fast** as the original game outside hyper (death bonus unchanged). During a hyper nothing fills it (kills and laser hits add nothing); only hidden bees raise **HYPER Lv**.
+- **Hyper meter** fills **3 times as fast** as the original game outside hyper (death bonus unchanged). During a hyper kills and laser hits add nothing; hidden bees raise **HYPER Lv**, and **every star you pick up fills the meter** (9, the same as a small kill outside hyper).
 - **GP bonus during hyper** by the hyper level at the start of the hyper (hypers spent): Lv1 x2.0, Lv2 x2.2, Lv3 x2.4, Lv4 x2.6, Lv5 x2.8, Lv6-10 x3.0 (original: x1.1-x1.5, then x2.2-x3.0). It stays the same until the hyper ends, even if HYPER Lv goes up.
 - **Rank up to 999**: rank no longer stops at 50 (the HUD shows 3 digits). Up to 50 it works as in the original game; above 50 enemy bullets get faster: +0.2% per rank up to rank 100 (+10%), then +0.1% per rank (200 +20%, 500 +50%, 999 +99.9%), compared with rank 50. Rank still goes up with hypers and down with bombs.
 - **Hyper ready voice**: the "HYPER SYSTEM READY" voice also plays whenever HYPER Lv goes up during a hyper.
 - **Hidden bees**: every hidden bee shows **+100%** and gives exactly **one hyper** (max 10; no combo-based meter gain). During a hyper it raises **HYPER Lv** by 1 instead (the GP bonus stays as it was). Every bee also cancels all bullets into big stars.
 - **No 99999 HIT limit**: the HIT counter goes up to 9,999,999. The big HIT number keeps its even spacing for 6-7 digits, and the HUD MAX number packs its digits slightly tighter above 99,999 so it fits next to the MAX label.
 - **Stage-clear Hit Bonus is hits x 10,000** (was x 20,000) and is drawn correctly above 2,147,483,647. It is capped at 4,294,967,295: above 429,496 hits the tally counts 429,496 hits (bonus 4,294,960,000).
-- **Bullets cancel near enemies** (not during hyper): a bullet that flies within 24 px of an enemy (any bullet emitter) turns into a small star, and bullets within 16 px of one cancelled the frame before cancel too, so it ripples outwards. Bullets younger than 7 frames and a bullet's own birthplace don't count.
-- **Shot cancels bullets during hyper**: while a hyper is active, enemy bullets touched by your shot (not the laser) are cancelled into big stars.
+- **Bullets cancel near enemies**: a bullet that flies within 24 px of an enemy (any bullet emitter) turns into a small star (a **big star** during hyper), and bullets within 16 px of one cancelled the frame before cancel too, so it ripples outwards. Bullets younger than 7 frames and a bullet's own birthplace don't count.
 
 ## Patching the game
 You need your own `ddpsdoj.zip` (MAME set, u4 CRC `e2a4411c`). The patched u4 has CRC `863fd921`.

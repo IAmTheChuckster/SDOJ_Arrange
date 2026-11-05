@@ -34,19 +34,8 @@ HOOKS = {
     'bombitem_hook': [0x0C22A508],
     'maxnum_hook': [0x0C27ADB4],
     'tally_hook':  [0x0C290974],
+    'star_hook':   [0x0C22C978],
     'hit_slots':   [0x0C27DC34],
-    'shot_stub0':  [0x0C2173B4],
-    'shot_stub1':  [0x0C217670],
-    'shot_stub2':  [0x0C217A34],
-    'shot_stub3':  [0x0C217DC0],
-    'shot_stub4':  [0x0C218144],
-    'shot_stub5':  [0x0C2183B0],
-    'shot_stub6':  [0x0C218724],
-    'shot_stub7':  [0x0C2189E0],
-    'shot_stub8':  [0x0C218D64],
-    'shot_stub9':  [0x0C218FD0],
-    'shot_stub10':  [0x0C219394],
-    'shot_stub11':  [0x0C2196A0],
 }
 # original values, checked by the loader before patching (protects against other dumps)
 ORIG = {
@@ -64,19 +53,8 @@ ORIG = {
     0x0C22A508: 0x0C1F7D50,
     0x0C27ADB4: 0x0C27E880,
     0x0C290974: 0x0C1F8C60,
+    0x0C22C978: 0x0C1F6D00,
     0x0C27DC34: 0x0C5B59DC,
-    0x0C2173B4: 0x0C2173D0,
-    0x0C217670: 0x0C217680,
-    0x0C217A34: 0x0C217A80,
-    0x0C217DC0: 0x0C217DD0,
-    0x0C218144: 0x0C218160,
-    0x0C2183B0: 0x0C2183C0,
-    0x0C218724: 0x0C218770,
-    0x0C2189E0: 0x0C2189F0,
-    0x0C218D64: 0x0C218D80,
-    0x0C218FD0: 0x0C218FE0,
-    0x0C219394: 0x0C2193E0,
-    0x0C2196A0: 0x0C2196B0,
 }
 
 # plain value patches (address, original, new) - no hook code

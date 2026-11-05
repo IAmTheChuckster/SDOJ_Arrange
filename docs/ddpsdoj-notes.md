@@ -119,3 +119,6 @@ Variables at 0x0CE00000: mode (always 1 = Resurrected; title shows a gold RESURR
 - Exact meaning of the type 0 "hit milestone" counter (every 21 hits) vs. kill events.
 - Bee chain completion rules (+0x384 > 7).
 - Rank system (RANK on the HUD) not studied yet.
+
+- Star pickup: the item handler scores through literal 0x0C22C978 (0x0C1F6D00, r4 = player). Resurrected points it at star_hook, which in hyper also calls the gauge add 0x0C1FA830(player, STAR_GAUGE=9). 0x0C1FA830 adds to the gauge word at player+0x2FC (0..511, level-up above that).
+- Boot date string (t_date) and warning date (t_wdate, 20 characters, leading spaces centre it).

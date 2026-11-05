@@ -41,6 +41,7 @@ v_ncprev:   .long 0     ! proximity cancel: bullets cancelled last frame (cascad
         .equ ORIG_ACTHYP,  0x0C1FA0D0   ! ActivateHyper(p)
         .equ ORIG_GP,      0x0C1F8D40   ! GetGPBonus(p) -> percent
         .equ ORIG_KILL,    0x0C1FA320   ! GaugeEvent(p, amount, type)
+        .equ STAR_GAUGE,   9            ! gauge per star picked up in hyper (small kill 3 x3)
         .equ ORIG_BEE,     0x0C22A8F0   ! hidden bee collected (item r4 ...)
         .equ SPAWN_HYPER,  0x0C1FA7D0   ! spawn hyper item(s) (p, count)
         .equ CANCEL,       0x0C1FD040   ! bullet cancel (type, p, big)
@@ -207,6 +208,46 @@ tally_hook:
         .align 2
 l_tgo:      .long 0x0C1F8C60
 l_tcap:     .long 429496
+
+! ================================================================ star pickup -> hyper gauge
+! Wraps the score add of the star/item pickup (0x0C1F6D00, called with the player in r4).
+! In hyper (Resurrected mode only) every pickup also feeds the gauge by STAR_GAUGE
+! (3 = a small kill, x3 as the kills give outside hyper).
+        .global star_hook
+star_hook:
+        sts.l   pr,@-r15
+        mov.l   r8,@-r15
+        mov.l   r9,@-r15
+        mov     r4,r8
+        mov.l   l_sh_score,r0
+        jsr     @r0                 ! r4..r7 as the game set them
+        nop
+        mov     r0,r9
+        mov.l   l_sh_vars,r1
+        mov.l   @(0,r1),r0
+        cmp/eq  #1,r0
+        bf      sh_done
+        mov.w   w_sh_2e0,r0
+        mov.l   @(r0,r8),r0         ! hyper active?
+        tst     r0,r0
+        bt      sh_done
+        mov     r8,r4
+        mov     #STAR_GAUGE,r5
+        mov.l   l_sh_gauge,r0
+        jsr     @r0                 ! game's gauge add (player, amount)
+        nop
+sh_done:
+        mov     r9,r0
+        mov.l   @r15+,r9
+        mov.l   @r15+,r8
+        lds.l   @r15+,pr
+        rts
+        nop
+w_sh_2e0:   .word 0x2E0
+        .align 2
+l_sh_score: .long 0x0C1F6D00
+l_sh_gauge: .long 0x0C1FA830
+l_sh_vars:  .long v_mode
 
 ! ================================================================ big HIT counter
 ! Digit positions (x, y) for the big HIT number: the game's 5 slots, 21 px apart,
@@ -744,213 +785,6 @@ l3_tblA:      .long 0x0C338848   ! kill gauge by deaths
 l3_tblB:      .long 0x0C33881C   ! kill gauge by hyper stock
 
 
-! ================================================================ shot vs bullet (1.5+ hyper)
-! Each player-shot update routine (4 per ship) is redirected to a stub that runs the
-! original update, then - in 1.5+ during hyper - cancels enemy bullets touching the shot.
-! The laser uses other routines, so it does not cancel bullets.
-        .global shot_stub0
-        .align 2
-shot_stub0:
-        mov.l   1f,r1
-        bra     shot_common
-        nop
-        .align 2
-1:      .long   0x0C2173D0
-        .global shot_stub1
-        .align 2
-shot_stub1:
-        mov.l   1f,r1
-        bra     shot_common
-        nop
-        .align 2
-1:      .long   0x0C217680
-        .global shot_stub2
-        .align 2
-shot_stub2:
-        mov.l   1f,r1
-        bra     shot_common
-        nop
-        .align 2
-1:      .long   0x0C217A80
-        .global shot_stub3
-        .align 2
-shot_stub3:
-        mov.l   1f,r1
-        bra     shot_common
-        nop
-        .align 2
-1:      .long   0x0C217DD0
-        .global shot_stub4
-        .align 2
-shot_stub4:
-        mov.l   1f,r1
-        bra     shot_common
-        nop
-        .align 2
-1:      .long   0x0C218160
-        .global shot_stub5
-        .align 2
-shot_stub5:
-        mov.l   1f,r1
-        bra     shot_common
-        nop
-        .align 2
-1:      .long   0x0C2183C0
-        .global shot_stub6
-        .align 2
-shot_stub6:
-        mov.l   1f,r1
-        bra     shot_common
-        nop
-        .align 2
-1:      .long   0x0C218770
-        .global shot_stub7
-        .align 2
-shot_stub7:
-        mov.l   1f,r1
-        bra     shot_common
-        nop
-        .align 2
-1:      .long   0x0C2189F0
-        .global shot_stub8
-        .align 2
-shot_stub8:
-        mov.l   1f,r1
-        bra     shot_common
-        nop
-        .align 2
-1:      .long   0x0C218D80
-        .global shot_stub9
-        .align 2
-shot_stub9:
-        mov.l   1f,r1
-        bra     shot_common
-        nop
-        .align 2
-1:      .long   0x0C218FE0
-        .global shot_stub10
-        .align 2
-shot_stub10:
-        mov.l   1f,r1
-        bra     shot_common
-        nop
-        .align 2
-1:      .long   0x0C2193E0
-        .global shot_stub11
-        .align 2
-shot_stub11:
-        mov.l   1f,r1
-        bra     shot_common
-        nop
-        .align 2
-1:      .long   0x0C2196B0
-
-        .align 2
-shot_common:
-        sts.l   pr,@-r15
-        mov.l   r8,@-r15
-        mov.l   r9,@-r15
-        mov.l   r10,@-r15
-        mov.l   r11,@-r15
-        mov.l   r12,@-r15
-        mov.l   r13,@-r15
-        mov     r4,r8
-        jsr     @r1                 ! original shot update
-        nop
-        mov     r0,r13
-        tst     r0,r0
-        bt      sc_done             ! shot removed this frame
-        mov.l   s_vars,r1
-        mov.l   @r1,r0
-        cmp/eq  #1,r0
-        bf      sc_done             ! not 1.5+
-        mov.l   s_player,r2
-        mov.w   s_2e0,r0
-        mov.l   @(r0,r2),r0
-        tst     r0,r0
-        bt      sc_done             ! not in hyper
-        mov     r8,r2
-        add     #0x48,r2
-        mov.l   @r2+,r3             ! shot x
-        mov.l   r3,@(24,r1)
-        mov.l   @r2,r3              ! shot y
-        mov.l   r3,@(28,r1)
-        mov.l   s_bmgr,r9
-        mov.l   @r9,r9
-        tst     r9,r9
-        bt      sc_done
-        mov.l   s_mgroff,r0
-        add     r0,r9               ! bullet manager
-        mov.l   @(28,r9),r0
-        tst     r0,r0
-        bt      sc_done
-        mov.l   @(20,r9),r10        ! first bullet
-sc_loop:
-        tst     r10,r10
-        bt      sc_done
-        mov.l   @r10,r0
-        cmp/eq  #2,r0
-        bf      sc_next
-        mov.l   s_vars,r1
-        mov     r10,r2
-        add     #0x2C,r2
-        mov.l   @r2+,r3             ! bullet x
-        mov.l   @(24,r1),r0
-        sub     r0,r3
-        cmp/pz  r3
-        bt      sc_ax
-        neg     r3,r3
-sc_ax:  mov.l   s_rad,r0
-        cmp/gt  r0,r3
-        bt      sc_next
-        mov.l   @r2,r3              ! bullet y
-        mov.l   @(28,r1),r0
-        sub     r0,r3
-        cmp/pz  r3
-        bt      sc_ay
-        neg     r3,r3
-sc_ay:  mov.l   s_rad,r0
-        cmp/gt  r0,r3
-        bt      sc_next
-        ! cancel just this bullet: make it the only list entry for the game's cancel routine
-        mov.l   @(4,r10),r11        ! next
-        mov.l   @(20,r9),r12        ! list head
-        mov.l   r10,@(20,r9)
-        mov     #0,r0
-        mov.l   r0,@(4,r10)
-        mov     #1,r4               ! big stars
-        mov.l   s_player,r5
-        mov.l   s_cancel1,r0
-        jsr     @r0
-        nop
-        mov.l   r11,@(4,r10)
-        mov.l   r12,@(20,r9)
-        bra     sc_loop
-        mov     r11,r10
-sc_next:
-        bra     sc_loop
-        mov.l   @(4,r10),r10
-sc_done:
-        mov     r13,r0
-        mov.l   @r15+,r13
-        mov.l   @r15+,r12
-        mov.l   @r15+,r11
-        mov.l   @r15+,r10
-        mov.l   @r15+,r9
-        mov.l   @r15+,r8
-        lds.l   @r15+,pr
-        rts
-        nop
-        .align 1
-s_2e0:  .word 0x2E0
-        .align 2
-s_vars:    .long v_mode
-s_player:  .long 0x0C5F9970
-s_bmgr:    .long 0x0C4C8978
-s_mgroff:  .long 0x00030DFC
-s_rad:     .long 0x000A0000     ! 10 px
-s_cancel1: .long 0x0C1FE220     ! cancel bullets in the manager list (flag, player)
-
 ! ================================================================ bomb item (1.5+)
 ! 0x0C1F7D50 is called by the bomb item pickup (literal 0x0C22A508): cancel bullets into big stars.
         .global bombitem_hook
@@ -986,7 +820,7 @@ bi_cancel: .long CANCEL
 
 ! ================================================================ proximity cancel
 ! Every frame (r4 = player): bullets that fly within 24 px of an enemy (any bullet
-! emitter) turn into small stars, unless the player is in hyper. Bullets within 16 px
+! emitter) turn into stars: small stars, or big stars while the player is in hyper. Bullets within 16 px
 ! of a bullet cancelled the frame before cancel too, so it ripples outwards.
 ! Emitters are the places bullets spawn at; they are remembered for 30 frames. A
 ! bullet never counts its own birthplace as an enemy, and bullets younger than 7
@@ -1042,7 +876,9 @@ nc_inited:
         mov.w   nc_c_2e0,r0
         mov.l   @(r0,r8),r0             ! hyper active?
         tst     r0,r0
-        movt    r11                     ! r11 = 1 when cancelling is allowed
+        movt    r11
+        mov     #1,r1
+        xor     r1,r11                  ! r11 = 1 in hyper = big stars, 0 = small stars
         mov     #0,r10                  ! bullets cancelled this frame
         mov.l   nc_c_mgr,r0
         mov.l   @r0,r1
@@ -1094,8 +930,6 @@ nc_old:
         mov     r1,r0
 nc_agok:
         mov.l   r0,@r12
-        tst     r11,r11
-        bt      nc_next                 ! in hyper
         mov     #7,r1
         cmp/ge  r1,r0
         bf      nc_next                 ! too young
@@ -1264,7 +1098,7 @@ nc_cancel:
         mov.l   r4,@r9
         mov.l   r2,@(32,r9)
         mov.l   r5,@(24,r9)
-        mov.l   r5,@(16,r3)             ! 0 = small stars
+        mov.l   r11,@(16,r3)            ! 0 = small stars (not in hyper), 1 = big stars (hyper)
         mov.l   r1,@(8,r3)
         mov.l   r1,@(12,r3)
         mov.l   r8,@(44,r7)
@@ -1493,8 +1327,8 @@ bt_tab:
         .long 0x0C30D408, t_wdate, 20
         .long 0
 t_title: .ascii "       SDOJ RESURRECTED   "
-t_date:  .ascii "2026.10.30"
-t_wdate: .ascii "          2026/10/30"
+t_date:  .ascii "2026.11.5 "
+t_wdate: .ascii "           2026/11/5"
 t_warn:
         .ascii "   THIS PROJECT IS UNOFFICIAL "
         .byte 0,0
