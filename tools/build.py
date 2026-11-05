@@ -32,10 +32,8 @@ HOOKS = {
     'speed_hook':   [0x0C1FE734],
     'v_hudrank':    [0x0C27EDF0],
     'bombitem_hook': [0x0C22A508],
-    'maxnum_hook': [0x0C27ADB4],
     'tally_hook':  [0x0C290974],
     'life_hook':   [0x0C22A8CC],
-    'hit_slots':   [0x0C27DC34],
 }
 # original values, checked by the loader before patching (protects against other dumps)
 ORIG = {
@@ -51,26 +49,18 @@ ORIG = {
     0x0C1FE734: 0x0C1F37A0,
     0x0C27EDF0: 0x0C661B48,
     0x0C22A508: 0x0C1F7D50,
-    0x0C27ADB4: 0x0C27E880,
     0x0C290974: 0x0C1F8C60,
     0x0C22A8CC: 0x0C1F7470,
-    0x0C27DC34: 0x0C5B59DC,
 }
 
 # plain value patches (address, original, new) - no hook code
 CONSTS = [
-    (0x0C1F6CE0, 0x0001869F, 9999999),     # HIT (combo) cap 99999 -> 9,999,999
-    (0x0C27DC24, 0x27100009, 1000000),     # HIT HUD: first divisor 10000 -> 1000000 (7 digits)
-    (0x0C27DAF0, 0x9A984D11, 0xDA4C4D11),  #   mov.w -> mov.l for that divisor
-    (0x0C27DB60, 0x5C1B9A5F, 0x5C1BDA30),  #   same, second path
     # generic digit drawer (stage-clear bonus etc.): signed /10 -> unsigned /10,
     # so values of 2^31 and above (Hit Bonus = hits x 20,000) draw correctly
     (0x0C292490, 0x348DE60A, 0x3485E60A),  #   dmuls.l -> dmulu.l
     (0x0C292498, 0x48214821, 0x48014801),  #   shar,shar -> shlr,shlr
     (0x0C29249C, 0x4A003AAA, 0x4801EA00),  #   shll,subc -> shlr, mov #0,r10
     (0x0C292524, 0x66666667, 0xCCCCCCCD),  #   divide-by-10 magic, unsigned
-    # Hit Bonus = hits x 10,000 (was x 20,000): mov.w now reads the 10000 constant
-    (0x0C290D1C, 0x9063797C, 0x9065797C),  #   case 4 multiplier word (20000 -> 10000)
 ]
 
 
