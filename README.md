@@ -10,10 +10,10 @@ I did all the testing and planning.
 ## Patch Notes
 
 ### Title screen
-There is no mode menu: insert a coin and press **START** to play Resurrected. After the announcer says "SAIDAIOUJOU", a gold **RESURRECTED** slides in at the bottom of the title screen. Attract demos also play as Resurrected.
+There is no mode menu: insert a coin and press **START** to play the 2.0 patch. After the announcer says "SAIDAIOUJOU", a gold **2.0** slides in at the bottom of the title screen. Attract demos also play as Resurrected.
 
 ### Boot and warning screens
-The boot screen shows **SDOJ RESURRECTED 2026.11.5**, and the warning screen shows a short unofficial-project notice, **HAVE FUN!!!** and the date 2026/11/5 .
+The boot screen shows **SAIDAIOUJOU 2.0 2026.11.5**, and the warning screen shows a short unofficial-project notice, **HAVE FUN!!!** and the date 2026/11/5 .
 
 ### Changes
 - **Buttons**: buttons 1-3 work as in the original game (button 2 = bomb, or hyper when a hyper is ready). **Button 4 = bomb only**, so with a hyper ready you can bomb with button 4 and press button 2 during the bomb to go into hyper.

@@ -289,7 +289,7 @@ dn_go:
         .align 1
 w_ylim: .word 0xCC
 w_tvoice: .word 160
-w_tx:   .word 76
+w_tx:   .word 108
 w_ty:   .word 220
 w_b8:   .word 0xB8
 w_tcol: .word 0xF0
@@ -1311,7 +1311,7 @@ bt_tab:
         .long 0x0C30D268, t_warn, 416
         .long 0x0C30D408, t_wdate, 20
         .long 0
-t_title: .ascii "       SDOJ RESURRECTED   "
+t_title: .ascii "        SAIDAIOUJOU 2.0   "
 t_date:  .ascii "2026.11.5 "
 t_wdate: .ascii "           2026/11/5"
 t_warn:
@@ -1351,6 +1351,6 @@ s_arc_off: .asciz "  ARCADE"
 s_15_on:   .asciz "> 1.5+"
 s_15_off:  .asciz "  1.5+"
 s_blank:   .asciz " "
-s_resur:   .asciz "RESURRECTED"
+s_resur:   .asciz "2.0"
         .align 2
 _end:
