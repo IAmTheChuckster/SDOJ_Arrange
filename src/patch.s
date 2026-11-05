@@ -413,7 +413,7 @@ ah_go:
         mov.l   l2_orig_acthyp,r0
         jmp     @r0
         nop
-ah_15:                              ! 1.5+: rank goes past 50 (max 999)
+ah_15:                              ! 1.5+: rank limit 50, as the original
         sts.l   pr,@-r15
         mov.l   r8,@-r15
         mov.l   r9,@-r15
@@ -513,7 +513,7 @@ gp_ret:
 w_2ec:  .word 0x2EC
 w_2e4b: .word 0x2E4
 w_2f0:  .word 0x2F0
-w_999:  .word 999
+w_999:  .word 50      ! rank limit (the original game's)
 w_3bb:  .word 0x3BB
 w_180:  .word 180
 w_300:  .word 300
@@ -1161,12 +1161,6 @@ hyplv_frame:
         mov.l   x_ncframe,r0        ! bullets near enemies cancel into stars (not in hyper)
         jsr     @r0
         nop
-        mov.l   x_hudcode,r1        ! HUD rank: 3 digits, no cap at 99
-        mov.l   x_hud3,r0
-        mov.l   r0,@r1
-        add     #-12,r1             ! and moved half a digit right (centred under RANK)
-        mov.l   x_hudx3,r0
-        mov.l   r0,@r1
         mov.w   x_2e8,r0
         mov.l   @(r0,r8),r2         ! HYPER Lv now
         mov.l   x_vars,r1
