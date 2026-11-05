@@ -41,7 +41,6 @@ v_ncprev:   .long 0     ! proximity cancel: bullets cancelled last frame (cascad
         .equ ORIG_ACTHYP,  0x0C1FA0D0   ! ActivateHyper(p)
         .equ ORIG_GP,      0x0C1F8D40   ! GetGPBonus(p) -> percent
         .equ ORIG_KILL,    0x0C1FA320   ! GaugeEvent(p, amount, type)
-        .equ STAR_GAUGE,   9            ! gauge per star picked up in hyper (small kill 3 x3)
         .equ ORIG_BEE,     0x0C22A8F0   ! hidden bee collected (item r4 ...)
         .equ SPAWN_HYPER,  0x0C1FA7D0   ! spawn hyper item(s) (p, count)
         .equ CANCEL,       0x0C1FD040   ! bullet cancel (type, p, big)
@@ -208,46 +207,6 @@ tally_hook:
         .align 2
 l_tgo:      .long 0x0C1F8C60
 l_tcap:     .long 429496
-
-! ================================================================ star pickup -> hyper gauge
-! Wraps the score add of the star/item pickup (0x0C1F6D00, called with the player in r4).
-! In hyper (Resurrected mode only) every pickup also feeds the gauge by STAR_GAUGE
-! (3 = a small kill, x3 as the kills give outside hyper).
-        .global star_hook
-star_hook:
-        sts.l   pr,@-r15
-        mov.l   r8,@-r15
-        mov.l   r9,@-r15
-        mov     r4,r8
-        mov.l   l_sh_score,r0
-        jsr     @r0                 ! r4..r7 as the game set them
-        nop
-        mov     r0,r9
-        mov.l   l_sh_vars,r1
-        mov.l   @(0,r1),r0
-        cmp/eq  #1,r0
-        bf      sh_done
-        mov.w   w_sh_2e0,r0
-        mov.l   @(r0,r8),r0         ! hyper active?
-        tst     r0,r0
-        bt      sh_done
-        mov     r8,r4
-        mov     #STAR_GAUGE,r5
-        mov.l   l_sh_gauge,r0
-        jsr     @r0                 ! game's gauge add (player, amount)
-        nop
-sh_done:
-        mov     r9,r0
-        mov.l   @r15+,r9
-        mov.l   @r15+,r8
-        lds.l   @r15+,pr
-        rts
-        nop
-w_sh_2e0:   .word 0x2E0
-        .align 2
-l_sh_score: .long 0x0C1F6D00
-l_sh_gauge: .long 0x0C1FA830
-l_sh_vars:  .long v_mode
 
 ! ================================================================ big HIT counter
 ! Digit positions (x, y) for the big HIT number: the game's 5 slots, 21 px apart,

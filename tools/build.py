@@ -34,7 +34,6 @@ HOOKS = {
     'bombitem_hook': [0x0C22A508],
     'maxnum_hook': [0x0C27ADB4],
     'tally_hook':  [0x0C290974],
-    'star_hook':   [0x0C22C978],
     'life_hook':   [0x0C22A8CC],
     'hit_slots':   [0x0C27DC34],
 }
@@ -54,7 +53,6 @@ ORIG = {
     0x0C22A508: 0x0C1F7D50,
     0x0C27ADB4: 0x0C27E880,
     0x0C290974: 0x0C1F8C60,
-    0x0C22C978: 0x0C1F6D00,
     0x0C22A8CC: 0x0C1F7470,
     0x0C27DC34: 0x0C5B59DC,
 }
