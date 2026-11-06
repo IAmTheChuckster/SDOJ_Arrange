@@ -9,7 +9,7 @@ _start:
 ! ---------------------------------------------------------------- variables
         .org 0x000
 v_mode:     .long 0     ! 0 = Arcade, 1 = 1.5+, 2 = SDOJ Resurrection (placeholder)
-v_sel:      .long 1     ! title mode: 1 = Arrange, 0 = Original
+v_sel:      .long 0     ! title mode: 1 = Arrange, 0 = Original Arcade (default)
 v_menu:     .long 0     ! 1 while the mode menu is shown on the title
 v_nohyp:    .long 0     ! 1 = this bomb press must not start a hyper (button 4)
 v_prevheld: .long 0     ! P1 held bits last title frame (edge detect)
@@ -220,47 +220,15 @@ hit_slots:
 ! ================================================================ draw string hook
 ! Replace the rank line and the two extend lines with the mode menu.
         .global ds_hook
-ds_hook:
-ds_menu:
-        mov.l   l_vars0,r1
-        mov.l   @(8,r1),r0
-        tst     r0,r0
-        bt      ds_go
-        mov.l   @(4,r1),r2          ! sel
-        ! rank strings 0x0C30D590..0x0C30D5D7 -> line 0
-        mov.l   l_rank_lo,r0
-        cmp/hs  r0,r7
-        bf      ds_ext
-        mov.l   l_rank_hi,r0
-        cmp/hs  r0,r7
-        bt      ds_ext
-        mov     #0,r3
-        bra     ds_pick
-        nop
-ds_ext:
-        mov.l   l_ext_lo,r0
+ds_hook:                            ! hides the "1ST / 2ND" score-extend lines on the title
+        mov.l   l_ext_lo,r0             ! (they overlap the mode lines); stays in both modes
         cmp/hs  r0,r7
         bf      ds_go
         mov.l   l_ext_hi,r0
         cmp/hs  r0,r7
         bt      ds_go
-        mov     #1,r3
-        mov.w   w_ylim,r0
-        cmp/ge  r0,r5               ! y >= 0xCC -> second extend line
-        bf      ds_pick
-        mov     #2,r3
-        add     #8,r5               ! move the last line down 8 px (16 px spacing)
-ds_pick:
-        ! index = line*2 + (sel==line ? 0 : 1)
-        mov     r3,r0
-        add     r0,r0
-        cmp/eq  r2,r3
-        bt      ds_sel
-        add     #1,r0
-ds_sel:
-        shll2   r0
-        mov.l   l_strtab,r1
-        mov.l   @(r0,r1),r7
+        rts
+        nop
 ds_go:
         mov.l   l_orig_ds,r0
         jmp     @r0

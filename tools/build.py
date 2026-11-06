@@ -170,7 +170,7 @@ def main():
             table.append((a, ORIG[a], syms[sym]))
     table += CONSTS
     lsrc = os.path.join(tmp, 'loader.s')
-    open(lsrc, 'w').write(loader_source(len(blob), table, syms['boot_init'], len(HOOKS['title_hook'])))
+    open(lsrc, 'w').write(loader_source(len(blob), table, syms['boot_init'], len(HOOKS['title_hook']) + len(HOOKS['ds_hook'])))
     loader, _ = asm_link(lsrc, 0xA0000000 | ROM_LOADER, tmp, 'loader')
 
     # changes in big-endian u4 coordinates
