@@ -7,6 +7,9 @@ Why did I make this? Because it's fun and for my own personal research to see th
 While Claude was used I put effort in making sure there are balanced gameplay.<br> 
 I did all the testing and planning.
 
+## To Do
+1. Make an omake mode
+
 ## Patch Notes
 
 ### Title screen
