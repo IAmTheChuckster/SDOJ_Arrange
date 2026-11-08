@@ -8,7 +8,7 @@ While Claude was used I put effort in making sure there are balanced gameplay.<b
 I did all the testing and planning.
 
 ## To Do
-1. Make an omake mode
+1. Add Power Mode from DFK
 
 ## Patch Notes
 
