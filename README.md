@@ -59,10 +59,6 @@ python3 sdoj_patch.py ddpsdoj.zip --zip --mra
 
 Developers: `src/patch.s` is the SH-3 source; `python3 tools/build.py` (needs SH binutils such as `binutils-sh4-linux-gnu`) regenerates `sdoj_patch_data.py`; then `python3 tools/make_web.py ddpsdoj.zip` regenerates `index.html`, the .mra CRC and this README's CRC. The patch adds a small boot loader in unused u4 space that copies the new code to free work RAM (0x0CE00000) and redirects a few code pointers in the unpacked program. Research notes are in `docs/ddpsdoj-notes.md`.
 
-## Skills
-
-- [`skills/sdoj-arrange-build`](skills/sdoj-arrange-build/SKILL.md) - rebuild, extend, test (MAME 0.289) and release this patch with Claude: layout, the Original Arcade / Arrange Mode switch, build and test steps, and the house rules.
-
 ## Testing
 This patch was tested with MAME 0.289 and [CV1k core for the MiSTer FPGA by Raki](https://www.patreon.com/c/ikamusume/posts)<br>
 It may even work on a PCB but do so on your own risk.
