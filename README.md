@@ -9,6 +9,7 @@ I did all the testing and planning.
 
 ## To Do
 1. Add Power Mode from DFK
+2. Make Omake Mode like DOJ X-Mode
 
 ## Patch Notes
 
